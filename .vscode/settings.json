@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "*.js": "javascript",
+        "xhash": "cpp",
+        "xstring": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp",
+        "functional": "cpp",
+        "iostream": "cpp"
+    }
+}
