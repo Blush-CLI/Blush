@@ -3,17 +3,20 @@ import sys
 import os
 from build_windows import buildBlushWindows
 
-src_dir = "c:/Blush/src"
-build_path = "../build/debug-x64/blush.exe"
-build_dir = "../build/debug-x64"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # C:\Blush
+SRC_DIR = os.path.join(BASE_DIR, "src")
+BUILD_DIR = os.path.join(BASE_DIR, "build", "debug-x64")
+BUILD_PATH = os.path.join(BUILD_DIR, "blush.exe")
 
-if not os.path.exists(build_dir):
-    os.makedirs(build_dir)
+os.makedirs(BUILD_DIR, exist_ok=True)
 
 rebuild = "--rebuild" in [arg.lower() for arg in sys.argv[1:]]
 args_to_pass = [arg for arg in sys.argv[1:] if arg.lower() != "--rebuild"]
 
-if rebuild or not os.path.exists(build_path):
-    buildBlushWindows(src_dir)
+if rebuild or not os.path.exists(BUILD_PATH):
+    buildBlushWindows(SRC_DIR)
 
-subprocess.run([os.path.abspath(build_path)] + args_to_pass)
+if not os.path.exists(BUILD_PATH):
+    raise FileNotFoundError(f"Nie znaleziono pliku exe: {BUILD_PATH}")
+
+subprocess.run([BUILD_PATH] + args_to_pass, shell=True)
