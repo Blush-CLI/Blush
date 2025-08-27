@@ -1,4 +1,5 @@
-#include "includes/bcolors.h"
+#include "./includes/bcolors.h"
+Color chosenColor = Color::Default;
 #include <iostream>
 
 std::string colorCode(Color color) {
@@ -15,20 +16,10 @@ std::string colorCode(Color color) {
     }
 }
 
-std::string styleCode(Style style) {
-    switch(style) {
-        case Style::Bold:      return "1";
-        case Style::Italic:    return "3";
-        case Style::Underline: return "4";
-        case Style::Reversed:  return "7";
-        default:               return "0";
-    }
-}
-
 void setColor(Color color, const std::vector<Style>& styles, const std::string& font) {
     std::string code = "\033[";
     for (size_t i = 0; i < styles.size(); ++i) {
-        code += styleCode(styles[i]);
+        code += std::to_string(static_cast<int>(styles[i]));
         if (i + 1 < styles.size()) code += ";";
     }
     if (!styles.empty()) code += ";";

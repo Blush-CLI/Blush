@@ -4,6 +4,7 @@
 #include "./includes/bcolors.h"
 #include <signal.h>
 #include <csignal>
+#include <sstream>
 
 void beforeExit(int sigint) {
     setColor(Color::Red);
@@ -23,9 +24,17 @@ bool ifInArray(const std::string &check) {
     return commands.find(check) != commands.end();
 }
 
-void executeByCommand(const std::string &command) {
-    if (ifInArray(command)) {
-        commands[command]();
+void executeByCommand(const std::string &input) {
+    std::istringstream iss(input);
+    std::string cmd;
+    iss >> cmd;
+
+    std::vector<std::string> args;
+    std::string arg;
+    while (iss >> arg) args.push_back(arg);
+
+    if (commands.find(cmd) != commands.end()) {
+        commands[cmd](args);
     } else {
         setColor(Color::Red);
         std::cerr << "Unknown command!\n";

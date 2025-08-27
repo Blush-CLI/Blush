@@ -59,6 +59,9 @@
         "xtr1common": "cpp",
         "csignal": "cpp",
         "algorithm": "cpp",
-        "optional": "cpp"
-    }
+        "optional": "cpp",
+        "set": "cpp",
+        "sstream": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
