@@ -56,6 +56,9 @@
         "xlocnum": "cpp",
         "xloctime": "cpp",
         "xmemory": "cpp",
-        "xtr1common": "cpp"
+        "xtr1common": "cpp",
+        "csignal": "cpp",
+        "algorithm": "cpp",
+        "optional": "cpp"
     }
 }

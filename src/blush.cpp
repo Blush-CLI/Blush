@@ -1,43 +1,31 @@
 #include <iostream>
 #include <string>
-#include <map>
-#include <functional>
-#include ".\includes\bbcmds.h"
-#include ".\includes\bcolors.h"
+#include "./includes/cmd.h"
+#include "./includes/bcolors.h"
+#include <signal.h>
+#include <csignal>
 
-void helpCommand() {
-    setColor(Color::Green);
-    std::cout << "\nBlush Built-in Commands:\n";
+void beforeExit(int sigint) {
+    setColor(Color::Red);
+    std::cout << "\n\nExiting\n";
+    std::cout.flush();
     setColor();
-    for (const auto& [name, func] : bbcommands) {
-        setColor(Color::Blue);
-        std::cout << "  > ";
-        setColor(Color::Magenta);
-        std::cout << name << "\n";
-        setColor();
-    }
-    setColor();
+    exit(0);
 }
 
-void aboutCommand() {
-    std::cout << "About command in the future implementation\n";
-}
-
-void versionCommand() {
-    std::cout << "Version command in the future implementation\n";
-}
-
-void authorCommand() {
-    std::cout << "Author command in the future implementation\n";
+std::string trim(const std::string &s) {
+    size_t start = s.find_first_not_of(" \r\n\t");
+    size_t end = s.find_last_not_of(" \r\n\t");
+    return (start == std::string::npos) ? "" : s.substr(start, end - start + 1);
 }
 
 bool ifInArray(const std::string &check) {
-    return bbcommands.find(check) != bbcommands.end();
+    return commands.find(check) != commands.end();
 }
 
 void executeByCommand(const std::string &command) {
     if (ifInArray(command)) {
-        bbcommands[command]();
+        commands[command]();
     } else {
         setColor(Color::Red);
         std::cerr << "Unknown command!\n";
@@ -46,22 +34,28 @@ void executeByCommand(const std::string &command) {
 }
 
 int main() {
+    signal(SIGINT, beforeExit);
     std::string input;
-
+    
     while (true) {
         setColor(Color::Magenta);
         std::cout << "Blush >> ";
         setColor(Color::Blue);
-        std::getline(std::cin, input);
+        
+        if (!std::getline(std::cin, input)) {
+            if (std::cin.eof()) {
+                c_quit();
+            }
+            std::cin.clear();
+            continue;
+        }
 
+        input = trim(input);
         if (input.empty()) continue;
-        if (input == "exit" || input == "quit" || input == "q") {
-            setColor();
-            break;
-        };
 
-        setColor();
         executeByCommand(input);
         std::cout << "\n";
     }
+    
+    return 0;
 }
