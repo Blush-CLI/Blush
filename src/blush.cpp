@@ -10,6 +10,7 @@ void authorCommand();
 
 std::map<std::string, std::function<void()>> bbcommands = {
     {"help", helpCommand},
+    {"cmds", helpCommand},
     {"about", aboutCommand},
     {"version", versionCommand},
     {"author", authorCommand}
