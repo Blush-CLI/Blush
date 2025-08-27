@@ -2,25 +2,21 @@
 #include <string>
 #include <map>
 #include <functional>
-
-void helpCommand();
-void aboutCommand();
-void versionCommand();
-void authorCommand();
-
-std::map<std::string, std::function<void()>> bbcommands = {
-    {"help", helpCommand},
-    {"cmds", helpCommand},
-    {"about", aboutCommand},
-    {"version", versionCommand},
-    {"author", authorCommand}
-};
+#include ".\includes\bbcmds.h"
+#include ".\includes\bcolors.h"
 
 void helpCommand() {
-    std::cout << "Blush Built-in Commands:\n";
+    setColor(Color::Green);
+    std::cout << "\nBlush Built-in Commands:\n";
+    setColor();
     for (const auto& [name, func] : bbcommands) {
-        std::cout << "  > " << name << "\n";
+        setColor(Color::Blue);
+        std::cout << "  > ";
+        setColor(Color::Magenta);
+        std::cout << name << "\n";
+        setColor();
     }
+    setColor();
 }
 
 void aboutCommand() {
@@ -42,15 +38,30 @@ bool ifInArray(const std::string &check) {
 void executeByCommand(const std::string &command) {
     if (ifInArray(command)) {
         bbcommands[command]();
+    } else {
+        setColor(Color::Red);
+        std::cerr << "Unknown command!\n";
+        setColor();
     }
 }
 
-int main(int argc, char* argv[]) {
-    if (argc > 1 && !ifInArray(argv[1])) {
-        std::cout << "Unknown command!\n";
-    } else if (argc > 1) {
-        executeByCommand(argv[1]);
-    } else {
-        std::cout << "No command provided\n";
+int main() {
+    std::string input;
+
+    while (true) {
+        setColor(Color::Magenta);
+        std::cout << "Blush >> ";
+        setColor(Color::Blue);
+        std::getline(std::cin, input);
+
+        if (input.empty()) continue;
+        if (input == "exit" || input == "quit" || input == "q") {
+            setColor();
+            break;
+        };
+
+        setColor();
+        executeByCommand(input);
+        std::cout << "\n";
     }
 }
