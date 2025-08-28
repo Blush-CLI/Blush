@@ -4,8 +4,6 @@
 #include "./json.hpp"
 #include "../includes/iojson.h"
 
-// i need to tell you guys... This one is written by Ai, i lost my mind here.
-
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
@@ -143,4 +141,104 @@ std::string getConfigString(const std::string& path, const std::string& name, co
     auto val = getConfigValue(path, name);
     if (val.is_string()) return val.get<std::string>();
     return fallback;
+}
+
+bool saveToFile(const std::string& filePath, const nlohmann::json& j) {
+    try {
+        std::ofstream o(filePath);
+        o << j.dump(4);
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+nlohmann::json loadFromFile(const std::string& filePath) {
+    json j;
+    try {
+        if (fs::exists(filePath)) {
+            std::ifstream i(filePath);
+            i >> j;
+        }
+    } catch (...) {
+        j = json::object();
+    }
+    return j;
+}
+
+void saveConfigToFilePath(const std::string& filePath, const std::string& path, const std::string& name, const nlohmann::json& value) {
+    std::string finalFile = filePath;
+    if (filePath == "blush_dir") finalFile = BASE_DIR + "/config.json";
+
+    json j = loadFromFile(finalFile);
+    json* target = &j;
+    std::string key = path;
+    bool isArray = false;
+
+    if (!path.empty() && path.back() == '}') {
+        key.pop_back();
+        if (!key.empty() && key.back() == '{') key.pop_back();
+    } else if (!path.empty() && path.back() == ']') {
+        key.pop_back();
+        if (!key.empty() && key.back() == '[') key.pop_back();
+        isArray = true;
+    }
+
+    if (!target->contains(key)) {
+        if (isArray) (*target)[key] = json::array();
+        else (*target)[key] = json::object();
+    }
+
+    if (isArray) {
+        json& arr = (*target)[key];
+        bool found = false;
+        for (auto& el : arr) {
+            if (el.is_object() && el.contains(name)) {
+                el[name] = value;
+                found = true;
+                break;
+            }
+        }
+        if (!found) arr.push_back({{name, value}});
+    } else {
+        (*target)[key][name] = value;
+    }
+
+    saveToFile(finalFile, j);
+}
+
+nlohmann::json getConfigValueFromFile(const std::string& filePath, const std::string& path, const std::string& name) {
+    std::string finalFile = filePath;
+    if (filePath == "blush_dir") finalFile = BASE_DIR + "/config.json";
+
+    json j = loadFromFile(finalFile);
+    json* target = &j;
+    std::string key = path;
+    bool isArray = false;
+
+    if (!path.empty() && path.back() == '}') {
+        key.pop_back();
+        if (!key.empty() && key.back() == '{') key.pop_back();
+    } else if (!path.empty() && path.back() == ']') {
+        key.pop_back();
+        if (!key.empty() && key.back() == '[') key.pop_back();
+        isArray = true;
+    }
+
+    if (!target->contains(key)) return nullptr;
+
+    if (isArray) {
+        json& arr = (*target)[key];
+        for (auto& el : arr) {
+            if (el.is_object() && el.contains(name)) {
+                return el[name];
+            }
+        }
+        return nullptr;
+    } else {
+        if ((*target)[key].contains(name)) {
+            return (*target)[key][name];
+        }
+        return nullptr;
+    }
 }

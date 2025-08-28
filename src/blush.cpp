@@ -17,6 +17,7 @@
 #include "./includes/bcolors.h"
 #include "./includes/iojson.h"
 #include "./includes/trim.h"
+#include "./includes/historyhandler.h"
 
 void handleExit(int signal) {
     setColor(Color::Red);
@@ -29,10 +30,6 @@ void handleExit(int signal) {
 // TERMINAL CONTROL
 // ============================================================================
 
-/**
- * switches terminal between normal mode and raw mode
- * raw mode means it reads each keypress immediately instead of waiting for enter
- */
 void toggleRawMode(bool enable) {
 #ifndef _WIN32
     static struct termios originalSettings;
@@ -45,7 +42,7 @@ void toggleRawMode(bool enable) {
         }
         
         struct termios rawSettings = originalSettings;
-        rawSettings.c_lflag &= ~(ICANON | ECHO);  // disable line buffering and echo
+        rawSettings.c_lflag &= ~(ICANON | ECHO);
         tcsetattr(STDIN_FILENO, TCSANOW, &rawSettings);
     } 
     else if (settingsSaved) {
@@ -54,9 +51,6 @@ void toggleRawMode(bool enable) {
 #endif
 }
 
-/**
- * reads a single character from keyboard without waiting for enter
- */
 char readSingleChar() {
 #ifdef _WIN32
     return static_cast<char>(_getch());
@@ -71,24 +65,15 @@ char readSingleChar() {
 // DISPLAY FUNCTIONS
 // ============================================================================
 
-/**
- * redraws the command line with current input
- * clears old text if the new text is shorter
- */
 void updateCommandLine(const std::string& currentInput, size_t previousLength) {
     std::cout << "\r";
-    
     setColor(Color::Magenta);
     std::cout << "Blush >> ";
-    
     setColor(Color::Blue);
     std::cout << currentInput;
-    
-    // clear leftover characters if previous line was longer
     if (previousLength > currentInput.size()) {
         std::cout << std::string(previousLength - currentInput.size(), ' ');
     }
-    
     std::cout << "\r";
     setColor(Color::Magenta);
     std::cout << "Blush >> ";
@@ -101,10 +86,6 @@ void updateCommandLine(const std::string& currentInput, size_t previousLength) {
 // CMD EXEC
 // ============================================================================
 
-/**
- * takes user input and either runs a system command or a built-in command
- * system commands start with '>', built-in commands are looked up in the commands map
- */
 void runCommand(const std::string& userInput) {
     std::istringstream inputStream(userInput);
     std::string commandName;
@@ -121,21 +102,20 @@ void runCommand(const std::string& userInput) {
         std::cout << "System: ";
         setColor(chosenColor, {Style::Default});
         
-        if (userInput.length() > 1) {
-            std::string systemCommand = userInput.substr(1);
-            systemCommand = trimWhitespace(systemCommand);
-            if (!systemCommand.empty()) {
-                system(systemCommand.c_str());
-            }
+        std::string systemCommand = userInput.substr(1);
+        systemCommand = trimWhitespace(systemCommand);
+        if (!systemCommand.empty()) {
+            system(systemCommand.c_str());
         } else {
             std::cout << "(Blush: no system command provided)\n";
         }
         return;
     }
     
-    if (commands.find(commandName) != commands.end()) {
+    if (!commandName.empty() && commands.find(commandName) != commands.end()) {
         commands[commandName](arguments);
-    } else {
+        addHistory(userInput);
+    } else if (!commandName.empty()) {
         setColor(Color::Red);
         std::cerr << "> Unknown command!\n";
         setColor();
@@ -146,10 +126,6 @@ void runCommand(const std::string& userInput) {
 // INPUT HANDLING WITH AUTOCOMPLETE
 // ============================================================================
 
-/**
- * handles keyboard input with tab completion
- * supports backspace, ctrl+w (delete word), and tab for autocomplete
- */
 std::string getInputWithTabComplete(std::map<std::string, std::function<void(const std::vector<std::string>&)>>& availableCommands) {
     std::string inputBuffer;
     std::vector<std::string> autocompleteMatches;
@@ -162,39 +138,23 @@ std::string getInputWithTabComplete(std::map<std::string, std::function<void(con
     while (true) {
         char keyPressed = readSingleChar();
         
-        // submit the command
         if (keyPressed == '\n' || keyPressed == '\r') {
             std::cout << "\n";
             break;
         }
-        
-        // backspace or delete
         else if (keyPressed == 127 || keyPressed == 8) {
-            if (!inputBuffer.empty()) {
-                inputBuffer.pop_back();
-            }
+            if (!inputBuffer.empty()) inputBuffer.pop_back();
             autocompleteMatches.clear();
             currentMatchIndex = 0;
         }
-        
-        // ctrl+w - delete last word
         else if (keyPressed == 23) {
-            // remove trailing spaces
-            while (!inputBuffer.empty() && inputBuffer.back() == ' ') {
-                inputBuffer.pop_back();
-            }
-            // remove the actual word
-            while (!inputBuffer.empty() && inputBuffer.back() != ' ') {
-                inputBuffer.pop_back();
-            }
+            while (!inputBuffer.empty() && inputBuffer.back() == ' ') inputBuffer.pop_back();
+            while (!inputBuffer.empty() && inputBuffer.back() != ' ') inputBuffer.pop_back();
             autocompleteMatches.clear();
             currentMatchIndex = 0;
         }
-        
-        // tab key - autocomplete
         else if (keyPressed == '\t') {
             if (autocompleteMatches.empty()) {
-                // find all commands that start with current input
                 for (const auto& commandPair : availableCommands) {
                     if (commandPair.first.find(inputBuffer) == 0) {
                         autocompleteMatches.push_back(commandPair.first);
@@ -203,7 +163,6 @@ std::string getInputWithTabComplete(std::map<std::string, std::function<void(con
                 currentMatchIndex = 0;
             } 
             else {
-                // cycle through matches
                 currentMatchIndex = (currentMatchIndex + 1) % autocompleteMatches.size();
             }
             
@@ -211,8 +170,6 @@ std::string getInputWithTabComplete(std::map<std::string, std::function<void(con
                 inputBuffer = autocompleteMatches[currentMatchIndex];
             }
         }
-        
-        // regular printable character
         else if (isprint(keyPressed)) {
             inputBuffer += keyPressed;
             autocompleteMatches.clear();
@@ -230,11 +187,9 @@ std::string getInputWithTabComplete(std::map<std::string, std::function<void(con
 int main() {
     signal(SIGINT, handleExit);
 
-    // load config on startup
-    std::string bsucolor = getConfigString("startUp{}", "bsucolor"); // load blush color on startup
+    std::string bsucolor = getConfigString("startUp{}", "bsucolor");
     chosenColor = stringToColor(bsucolor);
     
-    // main cli loop
     while (true) {
         setColor(Color::Magenta);
         std::cout << "Blush >> ";

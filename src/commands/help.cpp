@@ -10,7 +10,7 @@ void c_help(const std::vector<std::string>& args) {
     for (const auto& [name, func] : commands) {
         setColor(Color::Blue);
         std::cout << "  > ";
-        setColor(Color::Magenta);
+        setColor(chosenColor);
         std::cout << name << "\n";
         setColor();
     }
