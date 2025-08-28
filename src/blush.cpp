@@ -1,69 +1,250 @@
 #include <iostream>
 #include <string>
-#include "./includes/cmd.h"
-#include "./includes/bcolors.h"
-#include <signal.h>
+#include <vector>
+#include <map>
 #include <csignal>
 #include <sstream>
+#include <functional>
 
-void beforeExit(int sigint) {
+#ifdef _WIN32
+    #include <conio.h>
+#else
+    #include <termios.h>
+    #include <unistd.h>
+#endif
+
+#include "./includes/cmd.h"
+#include "./includes/bcolors.h"
+#include "./includes/iojson.h"
+#include "./includes/trim.h"
+
+void handleExit(int signal) {
     setColor(Color::Red);
-    std::cout << "\n\nExiting\n";
-    std::cout.flush();
+    std::cout << "\nExiting\n";
     setColor();
     exit(0);
 }
 
-std::string trim(const std::string &s) {
-    size_t start = s.find_first_not_of(" \r\n\t");
-    size_t end = s.find_last_not_of(" \r\n\t");
-    return (start == std::string::npos) ? "" : s.substr(start, end - start + 1);
+// ============================================================================
+// TERMINAL CONTROL
+// ============================================================================
+
+/**
+ * switches terminal between normal mode and raw mode
+ * raw mode means it reads each keypress immediately instead of waiting for enter
+ */
+void toggleRawMode(bool enable) {
+#ifndef _WIN32
+    static struct termios originalSettings;
+    static bool settingsSaved = false;
+    
+    if (enable) {
+        if (!settingsSaved) {
+            tcgetattr(STDIN_FILENO, &originalSettings);
+            settingsSaved = true;
+        }
+        
+        struct termios rawSettings = originalSettings;
+        rawSettings.c_lflag &= ~(ICANON | ECHO);  // disable line buffering and echo
+        tcsetattr(STDIN_FILENO, TCSANOW, &rawSettings);
+    } 
+    else if (settingsSaved) {
+        tcsetattr(STDIN_FILENO, TCSANOW, &originalSettings);
+    }
+#endif
 }
 
-bool ifInArray(const std::string &check) {
-    return commands.find(check) != commands.end();
+/**
+ * reads a single character from keyboard without waiting for enter
+ */
+char readSingleChar() {
+#ifdef _WIN32
+    return static_cast<char>(_getch());
+#else
+    char character;
+    read(STDIN_FILENO, &character, 1);
+    return character;
+#endif
 }
 
-void executeByCommand(const std::string &input) {
-    std::istringstream iss(input);
-    std::string cmd;
-    iss >> cmd;
+// ============================================================================
+// DISPLAY FUNCTIONS
+// ============================================================================
 
-    std::vector<std::string> args;
-    std::string arg;
-    while (iss >> arg) args.push_back(arg);
+/**
+ * redraws the command line with current input
+ * clears old text if the new text is shorter
+ */
+void updateCommandLine(const std::string& currentInput, size_t previousLength) {
+    std::cout << "\r";
+    
+    setColor(Color::Magenta);
+    std::cout << "Blush >> ";
+    
+    setColor(Color::Blue);
+    std::cout << currentInput;
+    
+    // clear leftover characters if previous line was longer
+    if (previousLength > currentInput.size()) {
+        std::cout << std::string(previousLength - currentInput.size(), ' ');
+    }
+    
+    std::cout << "\r";
+    setColor(Color::Magenta);
+    std::cout << "Blush >> ";
+    setColor(Color::Blue);
+    std::cout << currentInput;
+    std::cout.flush();
+}
 
-    if (commands.find(cmd) != commands.end()) {
-        commands[cmd](args);
+// ============================================================================
+// CMD EXEC
+// ============================================================================
+
+/**
+ * takes user input and either runs a system command or a built-in command
+ * system commands start with '>', built-in commands are looked up in the commands map
+ */
+void runCommand(const std::string& userInput) {
+    std::istringstream inputStream(userInput);
+    std::string commandName;
+    inputStream >> commandName;
+    
+    std::vector<std::string> arguments;
+    std::string argument;
+    while (inputStream >> argument) {
+        arguments.push_back(argument);
+    }
+    
+    if (!commandName.empty() && commandName[0] == '>') {
+        setColor(Color::Yellow, {Style::Bold});
+        std::cout << "System: ";
+        setColor(chosenColor, {Style::Default});
+        
+        if (userInput.length() > 1) {
+            std::string systemCommand = userInput.substr(1);
+            systemCommand = trimWhitespace(systemCommand);
+            if (!systemCommand.empty()) {
+                system(systemCommand.c_str());
+            }
+        } else {
+            std::cout << "(Blush: no system command provided)\n";
+        }
+        return;
+    }
+    
+    if (commands.find(commandName) != commands.end()) {
+        commands[commandName](arguments);
     } else {
         setColor(Color::Red);
-        std::cerr << "Unknown command!\n";
+        std::cerr << "> Unknown command!\n";
         setColor();
     }
 }
 
-int main() {
-    signal(SIGINT, beforeExit);
-    std::string input;
+// ============================================================================
+// INPUT HANDLING WITH AUTOCOMPLETE
+// ============================================================================
+
+/**
+ * handles keyboard input with tab completion
+ * supports backspace, ctrl+w (delete word), and tab for autocomplete
+ */
+std::string getInputWithTabComplete(std::map<std::string, std::function<void(const std::vector<std::string>&)>>& availableCommands) {
+    std::string inputBuffer;
+    std::vector<std::string> autocompleteMatches;
+    size_t currentMatchIndex = 0;
+    size_t previousLineLength = 0;
     
+    toggleRawMode(true);
+    updateCommandLine(inputBuffer, previousLineLength);
+    
+    while (true) {
+        char keyPressed = readSingleChar();
+        
+        // submit the command
+        if (keyPressed == '\n' || keyPressed == '\r') {
+            std::cout << "\n";
+            break;
+        }
+        
+        // backspace or delete
+        else if (keyPressed == 127 || keyPressed == 8) {
+            if (!inputBuffer.empty()) {
+                inputBuffer.pop_back();
+            }
+            autocompleteMatches.clear();
+            currentMatchIndex = 0;
+        }
+        
+        // ctrl+w - delete last word
+        else if (keyPressed == 23) {
+            // remove trailing spaces
+            while (!inputBuffer.empty() && inputBuffer.back() == ' ') {
+                inputBuffer.pop_back();
+            }
+            // remove the actual word
+            while (!inputBuffer.empty() && inputBuffer.back() != ' ') {
+                inputBuffer.pop_back();
+            }
+            autocompleteMatches.clear();
+            currentMatchIndex = 0;
+        }
+        
+        // tab key - autocomplete
+        else if (keyPressed == '\t') {
+            if (autocompleteMatches.empty()) {
+                // find all commands that start with current input
+                for (const auto& commandPair : availableCommands) {
+                    if (commandPair.first.find(inputBuffer) == 0) {
+                        autocompleteMatches.push_back(commandPair.first);
+                    }
+                }
+                currentMatchIndex = 0;
+            } 
+            else {
+                // cycle through matches
+                currentMatchIndex = (currentMatchIndex + 1) % autocompleteMatches.size();
+            }
+            
+            if (!autocompleteMatches.empty()) {
+                inputBuffer = autocompleteMatches[currentMatchIndex];
+            }
+        }
+        
+        // regular printable character
+        else if (isprint(keyPressed)) {
+            inputBuffer += keyPressed;
+            autocompleteMatches.clear();
+            currentMatchIndex = 0;
+        }
+        
+        updateCommandLine(inputBuffer, previousLineLength);
+        previousLineLength = inputBuffer.size();
+    }
+    
+    toggleRawMode(false);
+    return inputBuffer;
+}
+
+int main() {
+    signal(SIGINT, handleExit);
+
+    // load config on startup
+    std::string bsucolor = getConfigString("startUp{}", "bsucolor"); // load blush color on startup
+    chosenColor = stringToColor(bsucolor);
+    
+    // main cli loop
     while (true) {
         setColor(Color::Magenta);
         std::cout << "Blush >> ";
-        setColor(Color::Blue);
         
-        if (!std::getline(std::cin, input)) {
-            if (std::cin.eof()) {
-                c_quit();
-            }
-            std::cin.clear();
-            continue;
+        std::string userInput = getInputWithTabComplete(commands);
+        userInput = trimWhitespace(userInput);
+        
+        if (!userInput.empty()) {
+            runCommand(userInput);
         }
-
-        input = trim(input);
-        if (input.empty()) continue;
-
-        executeByCommand(input);
-        std::cout << "\n";
     }
     
     return 0;

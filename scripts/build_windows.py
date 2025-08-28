@@ -27,7 +27,13 @@ def buildBlushWindows(src, args=None):
 
     subprocess.run(["windres", rc_file, "-O", "coff", "-o", res_file], check=True)
 
-    subprocess.run(["g++", "-std=c++23"] + cpp_files + [res_file, "-o", build_path], check=True)
+    subprocess.run([
+        "g++",
+        "-std=c++23",
+        "-static-libgcc",
+        "-static-libstdc++",
+        "-static",
+    ] + cpp_files + [res_file, "-o", build_path], check=True)
 
     os.remove(rc_file)
     print(f"Build finished: {build_path}")

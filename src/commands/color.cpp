@@ -2,6 +2,25 @@
 #include <vector>
 #include <string>
 #include "../includes/bcolors.h"
+#include "../includes/iojson.h"
+
+Color stringToColor(const std::string& str) {
+    std::string lower;
+    lower.reserve(str.size());
+    for (char c : str) lower += std::tolower(c);
+
+    if (lower == "default") return Color::Default;
+    if (lower == "black")   return Color::Black;
+    if (lower == "red")     return Color::Red;
+    if (lower == "green")   return Color::Green;
+    if (lower == "yellow")  return Color::Yellow;
+    if (lower == "blue")    return Color::Blue;
+    if (lower == "magenta") return Color::Magenta;
+    if (lower == "cyan")    return Color::Cyan;
+    if (lower == "white")   return Color::White;
+
+    return Color::Default; // fallback
+}
 
 std::string colorToString(Color color) {
     switch (color) {
@@ -20,7 +39,6 @@ std::string colorToString(Color color) {
 
 void c_color(const std::vector<std::string>& args) {
     setColor();
-
     if (args.empty()) {
         setColor(Color::Red);
         std::cout << "Please provide a color! <e.g: Red, Green, Blue>\n";
@@ -59,7 +77,16 @@ void c_color(const std::vector<std::string>& args) {
         return;
     }
 
-    setColor(chosenColor);
+    // Save to config, load on startup
+    if (args.size() > 1 && args[1] == "save") {
+        saveConfig("startUp{}", "bsucolor", args[0]);
+        setColor(chosenColor);
+        std::cout << "Color set to " << arg << " and will auto load on start\n";
+        setColor();
+        return;
+    }
 
+    // Set the color (for this time only)
+    setColor(chosenColor);
     std::cout << "Color set to " << arg << "\n";
 }

@@ -6,10 +6,10 @@ This version of Blush is written in C++, The first releases of Blush were Python
 
 ---
 
-This version is also a Dev Version - 1.0.0, Means it's not finished yet, Final Release Soon!
+This version is also a Dev Version - 1.0.0, Means that what you see may not be finished and this isn't a release.
 
 ---
 
-# Build - Only for Windows 🤮 Now!
+# Build - Windows (for now)!
 
 ```Scripts/run_windows.py``` - Use "--rebuild" flag to Compile again
