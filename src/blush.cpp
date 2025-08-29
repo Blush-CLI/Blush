@@ -18,6 +18,7 @@
 #include "./includes/iojson.h"
 #include "./includes/trim.h"
 #include "./includes/historyhandler.h"
+#include "./includes/s_upu.h" // Startup util
 
 void handleExit(int signal) {
     setColor(Color::Red);
@@ -25,10 +26,6 @@ void handleExit(int signal) {
     setColor();
     exit(0);
 }
-
-// ============================================================================
-// TERMINAL CONTROL
-// ============================================================================
 
 void toggleRawMode(bool enable) {
 #ifndef _WIN32
@@ -61,10 +58,6 @@ char readSingleChar() {
 #endif
 }
 
-// ============================================================================
-// DISPLAY FUNCTIONS
-// ============================================================================
-
 void updateCommandLine(const std::string& currentInput, size_t previousLength) {
     std::cout << "\r";
     setColor(Color::Magenta);
@@ -82,11 +75,10 @@ void updateCommandLine(const std::string& currentInput, size_t previousLength) {
     std::cout.flush();
 }
 
-// ============================================================================
 // CMD EXEC
-// ============================================================================
 
 void runCommand(const std::string& userInput) {
+    swn("Blush - Executing"); // change window name
     std::istringstream inputStream(userInput);
     std::string commandName;
     inputStream >> commandName;
@@ -121,10 +113,6 @@ void runCommand(const std::string& userInput) {
         setColor();
     }
 }
-
-// ============================================================================
-// INPUT HANDLING WITH AUTOCOMPLETE
-// ============================================================================
 
 std::string getInputWithTabComplete(std::map<std::string, std::function<void(const std::vector<std::string>&)>>& availableCommands) {
     std::string inputBuffer;
@@ -185,10 +173,12 @@ std::string getInputWithTabComplete(std::map<std::string, std::function<void(con
 }
 
 int main() {
-    signal(SIGINT, handleExit);
+    signal(SIGINT, handleExit); // Don't allow to exit lol
+
+    startm(); // starting up the start up things
 
     std::string bsucolor = getConfigString("startUp{}", "bsucolor");
-    chosenColor = stringToColor(bsucolor);
+    chosenColor = stringToColor(bsucolor); // Set custom users color
     
     while (true) {
         setColor(Color::Magenta);
@@ -199,6 +189,7 @@ int main() {
         
         if (!userInput.empty()) {
             runCommand(userInput);
+            sdwt(); // window default name
         }
     }
     
