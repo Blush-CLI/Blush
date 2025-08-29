@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blush CLI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" href="./assets/blush.ico" type="image/x-icon">
+</head>
+<body class="bg-gray-900 text-white font-sans flex flex-col min-h-screen">
+
+<div class="max-w-5xl mx-auto p-6 flex flex-col items-center space-y-10 flex-grow">
+
+  <div class="text-center">
+    <h1 class="text-6xl font-extrabold mb-3">Blush CLI</h1>
+    <p class="text-gray-400 text-lg mb-6">Powerful command-line interface for developers and enthusiasts.</p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <a id="download-btn" download class="bg-gray-800 hover:bg-gray-700 py-3 px-8 rounded-lg font-bold shadow transition transform hover:scale-105">
+        Download
+      </a>
+      <a href="/platforms" class="bg-gray-800 hover:bg-gray-700 py-3 px-8 rounded-lg font-bold shadow transition transform hover:scale-105">
+        Download for other platforms
+      </a>
+    </div>
+  </div>
+
+  <div class="bg-gray-800 rounded-xl p-6 shadow-xl w-full max-w-3xl space-y-4">
+    <h2 class="text-3xl font-semibold text-yellow-400 text-center">What's Blush?</h2>
+    <p class="text-gray-300 text-center">Blush is a modern CLI written in C++. It combines system commands with custom tools, history, and modular extensions to give developers full control over their workflow.</p>
+    <div class="flex justify-center mt-4">
+      <img src="https://repository-images.githubusercontent.com/1021183835/2cfd8f2d-6a36-4c34-bf1b-e01f6bf0d41e" alt="Blush Banner" class="rounded-xl shadow-2xl">
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6 w-full max-w-3xl">
+    <div class="bg-gray-800 rounded-xl p-5 shadow-lg space-y-3 text-center">
+      <h3 class="text-2xl font-bold text-green-400">Installation</h3>
+      <p class="text-gray-300">Currently, Blush doesn’t have an installer. Build the executable for your platform and run it.</p>
+    </div>
+    <div class="bg-gray-800 rounded-xl p-5 shadow-lg space-y-3 text-center">
+      <h3 class="text-2xl font-bold text-purple-400">Contribute</h3>
+      <p class="text-gray-300">Want to help build Blush? Contact me on Discord: <code>4raynixx</code></p>
+    </div>
+  </div>
+
+  <div class="bg-gray-800 rounded-xl p-5 shadow-lg space-y-3 text-center w-full max-w-3xl">
+    <h3 class="text-2xl font-bold text-pink-400">Enjoy Blush</h3>
+    <p class="text-gray-300">Use Blush, experiment with it, and don’t forget to drop a star if you like it!</p>
+  </div>
+
+</div>
+
+<script>
+const downloadBtn = document.getElementById('download-btn');
+let platform = 'Other platforms';
+let arch = '';
+
+const ua = navigator.userAgent;
+const isWindows = ua.indexOf('Win') !== -1;
+const isLinux = ua.indexOf('Linux') !== -1;
+
+if (isWindows) platform = 'Windows';
+else if (isLinux) platform = 'Linux';
+
+if (platform === 'Windows' || platform === 'Linux') {
+    if (navigator.userAgent.includes('WOW64') || navigator.userAgent.includes('Win64') || navigator.platform === 'Win64') arch = 'x64';
+    else if (navigator.userAgent.includes('Win32') || navigator.platform === 'Win32') arch = 'x86';
+    else arch = 'arm64';
+}
+
+let fileUrl = '#';
+if (platform === 'Windows') fileUrl = `https://cdn.getblush.xyz/get?file=blushins-${arch}.exe`;
+else if (platform === 'Linux') fileUrl = `https://cdn.getblush.xyz/get?file=blushins-${arch}`;
+
+downloadBtn.textContent = arch ? `Download for ${platform} ${arch}` : `Download for ${platform}`;
+downloadBtn.setAttribute('href', fileUrl);
+</script>
+
+</body>
+</html>
