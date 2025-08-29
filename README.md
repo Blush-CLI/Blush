@@ -1,4 +1,8 @@
 # Blush - CLI [IN DEVELOPMENT]
+
+# IMPORTANT!
+> You can see old Python code, I'm working a new Version written in C++. This version is outdated!
+---
 > Blush - A CLI Written in C++, has own commands, system commands, history, etc.  
 > Designed for power users and developers who want control over their terminal, with modular commands, easy extensions, and advanced workflow tools.
 
