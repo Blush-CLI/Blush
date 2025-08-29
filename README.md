@@ -13,6 +13,9 @@ For now, there is no automatic installer for this CLI, if you want to install it
 
 > Step 1: Build the Executable, Run it.
 
+# Website
+> https://getblush.xyz/
+
 # Contribute
 > If you want to make Blush too, please contact me on discord:
 > 
