@@ -2,7 +2,7 @@
 
 # IMPORTANT!
 > You can see old Python code, I'm working a new Version written in C++. This version is outdated!
-> You can see the new source heaeding over to the dev branch [Dev Branch](https://github.com/Blush-CLI/Blush/tree/dev)
+> You can see the new source heaeding over to the [Dev Branch](https://github.com/Blush-CLI/Blush/tree/dev)
 ---
 > Blush - A CLI Written in C++, has own commands, system commands, history, etc.  
 > Designed for power users and developers who want control over their terminal, with modular commands, easy extensions, and advanced workflow tools.
