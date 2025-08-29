@@ -1,4 +1,4 @@
-# Blush - Dev 1.0.0
+# Blush - Dev Latest
 
 ![Blush](https://raw.githubusercontent.com/Blush-CLI/Blush/refs/heads/dev-1.0.0/assets/blush.png)
 
