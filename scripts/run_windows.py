@@ -17,6 +17,6 @@ if rebuild or not os.path.exists(BUILD_PATH):
     buildBlushWindows(SRC_DIR)
 
 if not os.path.exists(BUILD_PATH):
-    raise FileNotFoundError(f"Nie znaleziono pliku exe: {BUILD_PATH}")
+    raise FileNotFoundError(f"Exe not found: {BUILD_PATH}")
 
 subprocess.run([BUILD_PATH] + args_to_pass, shell=True)
