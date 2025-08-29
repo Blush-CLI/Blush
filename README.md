@@ -6,7 +6,7 @@
 # Installation
 For now, there is no automatic installer for this CLI, if you want to install it manually please do the following steps:
 
-> Step 1: Build or Download the Executable, Run it.
+> Step 1: Build the Executable, Run it.
 
 # Ending
 > Have fun using Blush, appreciate all stars!
