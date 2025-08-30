@@ -2,3 +2,4 @@ build
 web/node_modules
 web/package-lock.json
 web/package.json
+src/installer/dist
