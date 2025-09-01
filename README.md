@@ -9,9 +9,7 @@
 
 ![Blush Banner](https://repository-images.githubusercontent.com/1021183835/2cfd8f2d-6a36-4c34-bf1b-e01f6bf0d41e)
 # Installation
-For now, there is no automatic installer for this CLI, if you want to install it manually please do the following steps:
-
-> Step 1: Build the Executable, Run it.
+For now, there is only GUI Installer, you can download the installer on our website it will download blush executable successfully. (for now only x43 Windows. you can build it urselt ./web/installer/)
 
 # Website
 > https://getblush.xyz/
