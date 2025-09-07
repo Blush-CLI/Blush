@@ -1,3 +1,9 @@
+/*
+ File: src/utils/iojson.cpp
+ Created: [25.08.2025]
+ Description: Manages JSON stuff
+*/
+
 #include <iostream>
 #include <fstream>
 #include <filesystem>

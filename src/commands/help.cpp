@@ -1,3 +1,11 @@
+/*
+ File: src/commands/help.cpp
+ Created: [25.08.2025]
+ Command: help
+ Description: iterates through all of these and displays each available built-in command
+ Part-of: built-in
+*/
+
 #include <iostream>
 #include <vector>
 #include "../includes/cmd.h"

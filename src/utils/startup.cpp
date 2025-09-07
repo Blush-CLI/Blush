@@ -1,3 +1,9 @@
+/*
+ File: src/utils/startup.cpp
+ Created: [25.08.2025]
+ Description: Does some things on startup
+*/
+
 #include <iostream>
 #include "../includes/s_upu.h"
 

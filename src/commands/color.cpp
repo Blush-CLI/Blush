@@ -1,3 +1,11 @@
+/*
+ File: src/commands/color.cpp
+ Created: [03.09.2025]
+ Command: color
+ Description: Let's you select a color, save it to config & display a color list
+ Part-of: built-in
+*/
+
 #include <iostream>
 #include <vector>
 #include <string>

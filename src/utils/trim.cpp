@@ -1,3 +1,9 @@
+/*
+ File: src/utils/trim.cpp
+ Created: [28.08.2025]
+ Description: Manages JSON stuff
+*/
+
 #include <string>
 
 /**

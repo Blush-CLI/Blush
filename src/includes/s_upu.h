@@ -1,3 +1,9 @@
+/*
+ File: src/includes/s_upu.h
+ Created: [03.08.2025]
+ Description: Defines for some window managing
+*/
+
 // s_upu.h = startup.cpp
 #pragma once
 void startm();

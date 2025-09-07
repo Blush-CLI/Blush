@@ -1,3 +1,9 @@
+/*
+ File: src/bcolors.cpp
+ Created: [25.08.2025]
+ Description: Functions for Blush color handling with ansi codes
+*/
+
 #include "./includes/bcolors.h"
 Color chosenColor = Color::Default;
 #include <iostream>

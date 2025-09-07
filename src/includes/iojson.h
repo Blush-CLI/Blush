@@ -1,3 +1,9 @@
+/*
+ File: src/includes/iojson.h
+ Created: [25.08.2025]
+ Description: For Config managing and all with json
+*/
+
 #pragma once
 #include <string>
 #include "../utils/json.hpp"

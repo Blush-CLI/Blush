@@ -1,3 +1,9 @@
+/*
+ File: src/includes/bcolors.h
+ Created: [25.08.2025]
+ Description: Color functions and etc here
+*/
+
 #pragma once
 #include <string>
 #include <vector>

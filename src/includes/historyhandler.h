@@ -1,3 +1,9 @@
+/*
+ File: src/includes/historyhandler.h
+ Created: [25.08.2025]
+ Description: Defines for some history cpp file
+*/
+
 #pragma once
 #include <iostream>
 #include <vector>

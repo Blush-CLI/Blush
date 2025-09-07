@@ -1,3 +1,9 @@
+/*
+ File: src/modules/history.cpp
+ Created: [03.08.2025]
+ Description: Manages history and all assiocated things with it
+*/
+
 #include <iostream>
 #include <vector>
 #include <string>

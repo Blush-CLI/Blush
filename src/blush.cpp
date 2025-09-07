@@ -1,3 +1,10 @@
+/*
+ >> Main file
+ File: src/blush.cpp
+ Created: [25.08.2025]
+ Description: All Blush logic
+*/
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -18,7 +25,7 @@
 #include "./includes/iojson.h"
 #include "./includes/trim.h"
 #include "./includes/historyhandler.h"
-#include "./includes/s_upu.h" // Startup util
+#include "./includes/s_upu.h"
 
 void handleExit(int signal) {
     setColor(Color::Red);
@@ -75,10 +82,8 @@ void updateCommandLine(const std::string& currentInput, size_t previousLength) {
     std::cout.flush();
 }
 
-// CMD EXEC
-
 void runCommand(const std::string& userInput) {
-    swn("Blush - Executing"); // change window name
+    swn("Blush - Executing");
     std::istringstream inputStream(userInput);
     std::string commandName;
     inputStream >> commandName;
@@ -93,14 +98,16 @@ void runCommand(const std::string& userInput) {
         setColor(Color::Yellow, {Style::Bold});
         std::cout << "System: ";
         setColor(chosenColor, {Style::Default});
-        
+
         std::string systemCommand = userInput.substr(1);
         systemCommand = trimWhitespace(systemCommand);
         if (!systemCommand.empty()) {
+            std::cout << "\n";
             system(systemCommand.c_str());
         } else {
             std::cout << "(Blush: no system command provided)\n";
         }
+        std::cout << "\n";
         return;
     }
     
@@ -173,12 +180,12 @@ std::string getInputWithTabComplete(std::map<std::string, std::function<void(con
 }
 
 int main() {
-    signal(SIGINT, handleExit); // Don't allow to exit lol
+    signal(SIGINT, handleExit);
 
-    startm(); // starting up the start up things
+    startm();
 
     std::string bsucolor = getConfigString("startUp{}", "bsucolor");
-    chosenColor = stringToColor(bsucolor); // Set custom users color
+    chosenColor = stringToColor(bsucolor);
     
     while (true) {
         setColor(Color::Magenta);
@@ -189,7 +196,7 @@ int main() {
         
         if (!userInput.empty()) {
             runCommand(userInput);
-            sdwt(); // window default name
+            sdwt();
         }
     }
     
