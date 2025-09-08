@@ -10,7 +10,7 @@
 
 void c_version(const std::vector<std::string>& args) {
     _la_animgo("Fetching newest online version");
-    std::string res = cfm::fetch("https://cdn.getblush.xyz/get?file=newestv.txt");
+    std::string res = cfm::fetch("https://cdn.getblush.xyz/newestv.txt");
     _la_animstop();
 
     if (res == "error code: 1015") {

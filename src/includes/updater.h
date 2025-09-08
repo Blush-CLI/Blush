@@ -33,7 +33,7 @@ inline std::string getExecutablePath() {
 
 inline void selfUpdate(const std::vector<std::string>& args) {
 #ifdef _WIN32
-    std::string url = "https://cdn.getblush.xyz/get?file=blush-win-x64.exe";
+    std::string url = "https://cdn.getblush.xyz/blush-win-x64.exe";
     std::string tmpFile = "blush-new.exe";
     std::string exePath = getExecutablePath();
 
@@ -73,7 +73,7 @@ inline void selfUpdate(const std::vector<std::string>& args) {
     exit(0);
 
 #else
-    std::string url = "https://cdn.getblush.xyz/get?file=blush-linux-x64";
+    std::string url = "https://cdn.getblush.xyz/blush-linux-x64";
     std::string tmpFile = "blush-new";
     std::string exePath = getExecutablePath();
 

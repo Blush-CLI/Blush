@@ -90,8 +90,8 @@ if (platform === 'Windows' || platform === 'Linux') {
 }
 
 let fileUrl = '#';
-if (platform === 'Windows') fileUrl = `https://cdn.getblush.xyz/get?file=blushins-${arch}.exe`;
-else if (platform === 'Linux') fileUrl = `https://cdn.getblush.xyz/get?file=blushins-${arch}`;
+if (platform === 'Windows') fileUrl = `https://cdn.getblush.xyz/blushins-${arch}.exe`;
+else if (platform === 'Linux') fileUrl = `https://cdn.getblush.xyz/blushins-${arch}`;
 
 downloadBtn.textContent = arch ? `Download for ${platform} ${arch}` : `Download for ${platform}`;
 downloadBtn.setAttribute('href', fileUrl);

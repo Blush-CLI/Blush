@@ -49,7 +49,7 @@ class TranslationFetcher(QThread):
                 'Cache-Control': 'no-cache'
             }
             
-            response = session.get("https://cdn.getblush.xyz/get?file=installer/translations.json", 
+            response = session.get("https://cdn.getblush.xyz/installer/translations.json", 
                                  headers=headers, timeout=15)
             response.raise_for_status()
             
@@ -1344,14 +1344,14 @@ class BlushInstaller(QMainWindow):
                     filename = "blush-win-arm64.exe"
                 else:
                     filename = "blush-win-x64.exe"
-                url = f"https://cdn.getblush.xyz/get?file={filename}"
+                url = f"https://cdn.getblush.xyz/{filename}"
                 local_filename = "blush.exe"
             elif self.system_info['os'] == 'mac':
                 if self.system_info['arch'] == 'arm64':
                     filename = "blush-mac-arm64"
                 else:
                     filename = "blush-mac-x64"
-                url = f"https://cdn.getblush.xyz/get?file={filename}"
+                url = f"https://cdn.getblush.xyz/{filename}"
                 local_filename = "blush"
             else:  # linux
                 if self.system_info['arch'] == 'x64':
@@ -1360,7 +1360,7 @@ class BlushInstaller(QMainWindow):
                     filename = "blush-linux-arm64"
                 else:
                     filename = "blush-linux-x64"
-                url = f"https://cdn.getblush.xyz/get?file={filename}"
+                url = f"https://cdn.getblush.xyz/{filename}"
                 local_filename = "blush"
                 
             if self.debug_mode:
