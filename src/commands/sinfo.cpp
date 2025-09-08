@@ -1,5 +1,6 @@
 #include "../includes/bcolors.h"
 #include "../includes/systeminfo.h"
+#include "../includes/loanim.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -15,9 +16,6 @@
 #include <unistd.h>
 #endif
 
-// ---------------------------
-// EXECUTE SHELL COMMAND
-// ---------------------------
 std::string execCommand(const std::string& cmd)
 {
 #ifndef _WIN32
@@ -53,23 +51,6 @@ std::string execCommand(const std::string& cmd)
 #endif
 }
 
-// ---------------------------
-// LOADING SPINNER
-// ---------------------------
-void loadingAnimation()
-{
-    std::string frames = "|/-\\";
-    for (int i = 0; i < 12; i++)
-    {
-        std::cout << "\rFetching " << frames[i % frames.size()] << std::flush;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-    std::cout << "\r                         \r";
-}
-
-// ---------------------------
-// VISUAL LENGTH UTF-8 / EMOJI
-// ---------------------------
 size_t visualLength(const std::string& str)
 {
     size_t len = 0;
@@ -102,9 +83,6 @@ size_t visualLength(const std::string& str)
     return len;
 }
 
-// ---------------------------
-// GET RAM INFO
-// ---------------------------
 std::string getRAMInfo()
 {
 #ifdef _WIN32
@@ -177,9 +155,6 @@ std::string getRAMInfo()
 #endif
 }
 
-// ---------------------------
-// GET CPU INFO
-// ---------------------------
 std::string getCPUInfo()
 {
 #ifdef _WIN32
@@ -194,9 +169,6 @@ std::string getCPUInfo()
 #endif
 }
 
-// ---------------------------
-// GET DISK INFO
-// ---------------------------
 std::string getDiskInfo()
 {
 #ifdef _WIN32
@@ -206,13 +178,10 @@ std::string getDiskInfo()
 #endif
 }
 
-// ---------------------------
-// SINFO
-// ---------------------------
 void c_sinfo(const std::vector<std::string>& args)
 {
     setColor(chosenColor);
-    loadingAnimation();
+    _la_animgo("Fetching");
 
     bool isWin = false;
 #ifdef _WIN32
@@ -249,6 +218,7 @@ void c_sinfo(const std::vector<std::string>& args)
 
     // Print top border
     setColor(chosenColor);
+    _la_animstop();
     std::cout << "+";
     for (size_t i = 0; i < maxLength + 3; i++)
     {

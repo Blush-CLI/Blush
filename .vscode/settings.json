@@ -86,7 +86,8 @@
         "variant": "cpp",
         "semaphore": "cpp",
         "stop_token": "cpp",
-        "thread": "cpp"
-    },
-    "C_Cpp.errorSquiggles": "disabled"
+        "thread": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp"
+    }
 }

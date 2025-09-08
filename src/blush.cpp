@@ -112,7 +112,7 @@ void runCommand(const std::string& userInput) {
     }
     
     if (!commandName.empty() && commands.find(commandName) != commands.end()) {
-        commands[commandName](arguments);
+        commands[commandName].func(arguments);
         addHistory(userInput);
     } else if (!commandName.empty()) {
         setColor(Color::Red);
@@ -121,7 +121,7 @@ void runCommand(const std::string& userInput) {
     }
 }
 
-std::string getInputWithTabComplete(std::map<std::string, std::function<void(const std::vector<std::string>&)>>& availableCommands) {
+std::string getInputWithTabComplete(std::map<std::string, Command>& availableCommands) {
     std::string inputBuffer;
     std::vector<std::string> autocompleteMatches;
     size_t currentMatchIndex = 0;

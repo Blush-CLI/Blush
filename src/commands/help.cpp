@@ -2,7 +2,7 @@
  File: src/commands/help.cpp
  Created: [25.08.2025]
  Command: help
- Description: iterates through all of these and displays each available built-in command
+ Description: Iterates through all commands and displays name + description
  Part-of: built-in
 */
 
@@ -15,11 +15,14 @@ void c_help(const std::vector<std::string>& args) {
     setColor(chosenColor);
     std::cout << "\nBlush Built-in Commands:\n";
     setColor();
-    for (const auto& [name, func] : commands) {
+
+    for (const auto& [name, cmd] : commands) {
         setColor(Color::Blue);
         std::cout << "  > ";
         setColor(chosenColor);
-        std::cout << name << "\n";
+        std::cout << name;
+        setColor(Color::Default);
+        std::cout << " - " << cmd.description << "\n";
         setColor();
     }
 }
