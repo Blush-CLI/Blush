@@ -33,7 +33,7 @@ def buildBlush(src, args=None):
     compile_cmd += cpp_files
     if res_file:
         compile_cmd.append(res_file)
-    compile_cmd += ["-o", build_path]
+    compile_cmd += ["-o", build_path, "-lcurl"]
 
     print(f"Compiling for {system_platform}...")
     subprocess.run(compile_cmd, check=True)
