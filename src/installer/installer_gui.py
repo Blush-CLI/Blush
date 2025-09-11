@@ -6,10 +6,18 @@ import subprocess
 import tempfile
 import zipfile
 import shutil
-import winreg
 import requests
 import locale
 from pathlib import Path
+
+if sys.platform == "win32":
+    import winreg
+else:
+    class WinRegStub:
+        def __getattr__(self, name):
+            return None
+    winreg = WinRegStub()
+
 from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
@@ -74,7 +82,6 @@ class TranslationFetcher(QThread):
             self._emit_fallback_translations()
     
     def _emit_fallback_translations(self):
-        # fallback when cdn is down or whatever
         fallback_translations = {
             "en": {
                 "title": "Blush Installer",
@@ -111,7 +118,6 @@ class BlurWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         
-        # rounded rectangle with blur effect
         rect = self.rect()
         path = QPainterPath()
         path.addRoundedRect(rect, 20, 20)
@@ -156,8 +162,7 @@ class AnimatedStatusWidget(QWidget):
         self.rotation = 0
         self.scale = 1.0
         self.pulse = 0
-        self.status = "idle"  # idle, downloading, installing, success, error
-        
+        self.status = "idle"
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_animation)
         
@@ -168,7 +173,7 @@ class AnimatedStatusWidget(QWidget):
     def set_status(self, status):
         self.status = status
         if status in ["downloading", "installing"]:
-            self.timer.start(30)  # smoother animation at 33 fps
+            self.timer.start(30)
             self.scale_animation.setStartValue(0.9)
             self.scale_animation.setEndValue(1.1)
             self.scale_animation.setEasingCurve(QEasingCurve.InOutSine)
@@ -180,8 +185,8 @@ class AnimatedStatusWidget(QWidget):
         self.update()
         
     def update_animation(self):
-        self.rotation = (self.rotation + 8) % 360  # faster rotation
-        self.pulse = (self.pulse + 0.1) % (2 * 3.14159)  # pulse effect
+        self.rotation = (self.rotation + 8) % 360
+        self.pulse = (self.pulse + 0.1) % (2 * 3.14159)
         self.update()
         
     def get_scale_factor(self):
@@ -210,7 +215,6 @@ class AnimatedStatusWidget(QWidget):
             painter.setPen(QPen(QColor(102, 126, 234), 3))
             painter.drawEllipse(-15, -15, 30, 30)
             
-            # animated download arrow
             painter.setPen(QPen(QColor(255, 255, 255), 3))
             painter.drawLine(0, -10, 0, 10)
             painter.drawLine(-5, 5, 0, 10)
@@ -226,7 +230,6 @@ class AnimatedStatusWidget(QWidget):
                 painter.drawLine(10, 0, 16, 0)
                 painter.rotate(30)
             
-            # center circle with pulse
             pulse_radius = 6 + 2 * abs(math.sin(self.pulse))
             painter.setBrush(QBrush(QColor(118, 75, 162, 150)))
             painter.setPen(Qt.NoPen)
@@ -263,19 +266,19 @@ class AnimatedProgressWidget(QWidget):
         self.rotation_angle = 0
         self.pulse_scale = 1.0
         self.pulse_direction = 1
-        self.setFixedHeight(120)  # bigger height for better animation space
+        self.setFixedHeight(120)
         
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_animation)
-        self.timer.start(30)  # smoother 33 fps animation
+        self.timer.start(30)
         
     def set_progress(self, value):
         self.progress = value
         self.update()
         
     def update_animation(self):
-        self.animation_offset = (self.animation_offset + 3) % 60  # faster animation
-        self.rotation_angle = (self.rotation_angle + 4) % 360  # smooth rotation
+        self.animation_offset = (self.animation_offset + 3) % 60
+        self.rotation_angle = (self.rotation_angle + 4) % 360
         
         self.pulse_scale += 0.02 * self.pulse_direction
         if self.pulse_scale >= 1.2:
@@ -292,48 +295,42 @@ class AnimatedProgressWidget(QWidget):
         center = self.rect().center()
         spinner_radius = 25
         
-        # animated spinner
         painter.save()
         painter.translate(center)
         painter.rotate(self.rotation_angle)
         
-        # multiple rotating circles for better effect
         for i in range(8):
             angle = i * 45
             painter.save()
             painter.rotate(angle)
             
-            # gradient effect based on position
             alpha = int(255 * (1 - i / 8.0))
             color = QColor(59, 130, 246, alpha)
             
             painter.setBrush(QBrush(color))
             painter.setPen(Qt.NoPen)
             
-            # pulsing circles
             radius = 4 * self.pulse_scale
             painter.drawEllipse(QPointF(spinner_radius, 0), radius, radius)
             painter.restore()
         
         painter.restore()
         
-        # progress bar at bottom
         rect = QRect(20, self.height() - 40, self.width() - 40, 20)
         
         painter.setBrush(QBrush(QColor(8, 8, 8, 180)))
         painter.setPen(QPen(QColor(64, 64, 64, 100), 1))
         painter.drawRoundedRect(rect, 10, 10)
         
-        # progress fill with enhanced animation
         if self.progress > 0:
             progress_width = int((rect.width() - 4) * self.progress / 100)
             progress_rect = QRect(rect.x() + 2, rect.y() + 2, progress_width, rect.height() - 4)
             
             gradient = QLinearGradient(0, 0, progress_rect.width(), 0)
-            gradient.setColorAt(0, QColor(34, 197, 94, 220))   # green
-            gradient.setColorAt(0.3, QColor(59, 130, 246, 220)) # blue
-            gradient.setColorAt(0.7, QColor(168, 85, 247, 220)) # purple
-            gradient.setColorAt(1, QColor(236, 72, 153, 220))   # pink
+            gradient.setColorAt(0, QColor(34, 197, 94, 220))
+            gradient.setColorAt(0.3, QColor(59, 130, 246, 220))
+            gradient.setColorAt(0.7, QColor(168, 85, 247, 220))
+            gradient.setColorAt(1, QColor(236, 72, 153, 220))
             
             painter.setBrush(QBrush(gradient))
             painter.setPen(Qt.NoPen)
@@ -353,7 +350,6 @@ class AnimatedProgressWidget(QWidget):
                 painter.setBrush(QBrush(shine_gradient))
                 painter.drawRoundedRect(shine_rect.intersected(progress_rect), 8, 8)
         
-        # progress text with glow effect
         painter.setPen(QPen(QColor(255, 255, 255, 200)))
         painter.setFont(QFont("Segoe UI", 11, QFont.Bold))
         text_rect = QRect(rect.x(), rect.y() - 25, rect.width(), 20)
@@ -446,13 +442,10 @@ class BlushInstaller(QMainWindow):
     def detect_system_language(self):
         """detect system language and return appropriate language code"""
         try:
-            # get system locale
             system_locale = locale.getdefaultlocale()[0]
             if system_locale:
-                # extract language code (first 2 characters)
                 lang_code = system_locale[:2].lower()
                 
-                # map language codes to supported languages
                 language_mapping = {
                     'en': 'en',  # english
                     'pl': 'pl',  # polish
@@ -473,7 +466,6 @@ class BlushInstaller(QMainWindow):
         except Exception as e:
             print(f"[BLUSH LOG] Error detecting system language: {e}")
         
-        # default to english if detection fails
         print(f"[BLUSH LOG] Using default language: en")
         return 'en'
         
@@ -585,12 +577,10 @@ class BlushInstaller(QMainWindow):
                         painter = QPainter(rounded_pixmap)
                         painter.setRenderHint(QPainter.Antialiasing)
                         
-                        # add subtle shadow
                         shadow_path = QPainterPath()
                         shadow_path.addRoundedRect(2, 2, 32, 23, 6, 6)
                         painter.fillPath(shadow_path, QColor(0, 0, 0, 50))
                         
-                        # main flag
                         path = QPainterPath()
                         path.addRoundedRect(0, 0, 32, 23, 6, 6)
                         painter.setClipPath(path)
@@ -598,7 +588,6 @@ class BlushInstaller(QMainWindow):
                         scaled_pixmap = pixmap.scaled(32, 23, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
                         painter.drawPixmap(0, 0, scaled_pixmap)
                         
-                        # add border
                         painter.setClipping(False)
                         painter.setPen(QPen(QColor(102, 126, 234, 100), 1))
                         painter.drawPath(path)
@@ -627,7 +616,6 @@ class BlushInstaller(QMainWindow):
         self.setWindowTitle("Blush Installer")
         self.setFixedSize(900, 700)
         
-        # massive stylesheet block - keeping it as is since it's just styling
         self.setStyleSheet("""
             QMainWindow {
                 background-color: #0a0a0a;
@@ -814,7 +802,7 @@ class BlushInstaller(QMainWindow):
         self.stacked_widget.setCurrentIndex(0)
         
     def create_welcome_page(self):
-        page = FadeWidget()  # use fadewWidget for smooth transitions
+        page = FadeWidget()
         layout = QVBoxLayout(page)
         layout.setSpacing(30)
         layout.setContentsMargins(50, 50, 50, 50)
@@ -992,7 +980,6 @@ class BlushInstaller(QMainWindow):
         
         layout.addStretch()
         
-        # simple status display
         self.status_label = QLabel("Preparing installation...")
         self.status_label.setAlignment(Qt.AlignCenter)
         self.status_label.setStyleSheet("""
@@ -1013,7 +1000,6 @@ class BlushInstaller(QMainWindow):
         """)
         layout.addWidget(self.status_icon)
         
-        # clean progress bar
         progress_container = QWidget()
         progress_container.setFixedHeight(60)
         progress_layout = QVBoxLayout(progress_container)
@@ -1040,7 +1026,6 @@ class BlushInstaller(QMainWindow):
         
         progress_layout.addWidget(self.progress_widget)
         
-        # progress percentage
         self.progress_label = QLabel("0%")
         self.progress_label.setAlignment(Qt.AlignCenter)
         self.progress_label.setStyleSheet("""
@@ -1054,7 +1039,6 @@ class BlushInstaller(QMainWindow):
         
         layout.addStretch()
         
-        # debug section
         debug_layout = QHBoxLayout()
         debug_layout.addStretch()
         
@@ -1212,7 +1196,6 @@ class BlushInstaller(QMainWindow):
         layout.setContentsMargins(60, 60, 60, 60)
         layout.setSpacing(30)
         
-        # title
         title = QLabel("Installing Blush")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("""
@@ -1225,7 +1208,6 @@ class BlushInstaller(QMainWindow):
         """)
         layout.addWidget(title)
         
-        # status label
         self.status_label = QLabel("Preparing installation...")
         self.status_label.setAlignment(Qt.AlignCenter)
         self.status_label.setStyleSheet("""
@@ -1237,14 +1219,12 @@ class BlushInstaller(QMainWindow):
         """)
         layout.addWidget(self.status_label)
         
-        # progress container
         progress_container = QWidget()
         progress_container.setFixedHeight(60)
         progress_layout = QVBoxLayout(progress_container)
         progress_layout.setContentsMargins(0, 0, 0, 0)
         progress_layout.setSpacing(10)
         
-        # progress bar background
         self.progress_widget = QWidget()
         self.progress_widget.setFixedHeight(8)
         self.progress_widget.setStyleSheet("""
@@ -1254,7 +1234,6 @@ class BlushInstaller(QMainWindow):
             }
         """)
         
-        # progress bar fill
         self.progress_fill = QWidget(self.progress_widget)
         self.progress_fill.setFixedHeight(8)
         self.progress_fill.setFixedWidth(0)
@@ -1267,7 +1246,6 @@ class BlushInstaller(QMainWindow):
         
         progress_layout.addWidget(self.progress_widget)
         
-        # progress percentage
         self.progress_label = QLabel("0%")
         self.progress_label.setAlignment(Qt.AlignCenter)
         self.progress_label.setStyleSheet("""
@@ -1294,7 +1272,6 @@ class BlushInstaller(QMainWindow):
         
         layout.addStretch()
         
-        # details text area for debug mode
         self.details_text = QTextEdit()
         self.details_text.setVisible(False)
         self.details_text.setStyleSheet("""
@@ -1344,14 +1321,14 @@ class BlushInstaller(QMainWindow):
                     filename = "blush-win-arm64.exe"
                 else:
                     filename = "blush-win-x64.exe"
-                url = f"https://cdn.getblush.xyz/{filename}"
+                url = f"https://cdn.getblush.xyz/latest/{filename}"
                 local_filename = "blush.exe"
             elif self.system_info['os'] == 'mac':
                 if self.system_info['arch'] == 'arm64':
                     filename = "blush-mac-arm64"
                 else:
                     filename = "blush-mac-x64"
-                url = f"https://cdn.getblush.xyz/{filename}"
+                url = f"https://cdn.getblush.xyz/latest/{filename}"
                 local_filename = "blush"
             else:  # linux
                 if self.system_info['arch'] == 'x64':
@@ -1360,14 +1337,23 @@ class BlushInstaller(QMainWindow):
                     filename = "blush-linux-arm64"
                 else:
                     filename = "blush-linux-x64"
-                url = f"https://cdn.getblush.xyz/{filename}"
+                url = f"https://cdn.getblush.xyz/latest/{filename}"
                 local_filename = "blush"
                 
+            self.download_file(url, local_filename)
+            
+        except Exception as e:
             if self.debug_mode:
-                self.details_text.append(f"[LOG] Downloading: {filename}")
-                self.details_text.append(f"[LOG] From: {url}")
+                self.details_text.append(f"[LOG] Error: {str(e)}")
+            QMessageBox.critical(self, self.tr("error"), str(e))
 
-            self.status_icon.setStyleSheet("""
+    def download_file(self, url, local_filename):
+        try:
+            if self.debug_mode:
+                self.details_text.append(f"[LOG] Downloading: {local_filename}")
+                self.details_text.append(f"[LOG] From: {url}")
+            
+            self.status_label.setStyleSheet("""
                 QLabel {
                     font-size: 24px;
                     color: #f59e0b;
@@ -1376,7 +1362,9 @@ class BlushInstaller(QMainWindow):
             """)
             self.status_label.setText("Starting download...")
             
-            temp_path = Path.home() / "Downloads" / local_filename
+            temp_dir = Path.home() / "tempblush"
+            temp_dir.mkdir(exist_ok=True)
+            temp_path = temp_dir / local_filename
             
             self.download_thread = DownloadThread(url, str(temp_path))
             self.download_thread.progress.connect(self.update_progress)
@@ -1445,7 +1433,7 @@ class BlushInstaller(QMainWindow):
             
             if self.system_info['os'] == 'win':
                 local_filename = "blush.exe"
-                temp_path = Path.home() / "Downloads" / local_filename
+                temp_path = Path.home() / "tempblush" / local_filename
                 
                 program_files = Path(os.environ.get('PROGRAMFILES', 'C:\\Program Files'))
                 blush_dir = program_files / "Blush"
@@ -1472,7 +1460,6 @@ class BlushInstaller(QMainWindow):
                 try:
                     import winreg
                     
-                    # try to add to system path first
                     if use_system_path:
                         try:
                             with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, 
@@ -1487,7 +1474,6 @@ class BlushInstaller(QMainWindow):
                         except PermissionError:
                             use_system_path = False
                     
-                    # fallback to user path
                     if not use_system_path:
                         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment", 0, winreg.KEY_ALL_ACCESS) as key:
                             try:
@@ -1501,7 +1487,6 @@ class BlushInstaller(QMainWindow):
                                 if self.debug_mode:
                                     self.details_text.append("[LOG] Added to user PATH")
                     
-                    # notify system of path change
                     import ctypes
                     from ctypes import wintypes
                     HWND_BROADCAST = 0xFFFF
@@ -1520,7 +1505,7 @@ class BlushInstaller(QMainWindow):
 
             else:  # linux/mac
                 local_filename = "blush"
-                temp_path = Path.home() / "Downloads" / local_filename
+                temp_path = Path.home() / "tempblush" / local_filename
                 
                 try:
                     system_bin = Path("/usr/local/bin")
@@ -1538,7 +1523,6 @@ class BlushInstaller(QMainWindow):
                         raise PermissionError("No system write access")
                         
                 except (PermissionError, OSError):
-                    # install to user directory
                     blush_dir = Path.home() / ".local" / "bin"
                     blush_dir.mkdir(parents=True, exist_ok=True)
                     
