@@ -6,6 +6,16 @@ const PORT = 2064;
 const FILES_DIR = path.join(__dirname, "files");
 
 const server = http.createServer((req, res) => {
+    // CORS
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Range");
+
+    if (req.method === "OPTIONS") {
+        res.writeHead(200);
+        return res.end();
+    }
+
     let safePath = path.normalize(req.url).replace(/^(\.\.[\/\\])+/, "");
     if (safePath === "/") safePath = "/index.html";
     const filePath = path.join(FILES_DIR, safePath);
@@ -22,6 +32,7 @@ const server = http.createServer((req, res) => {
             "Content-Disposition": `inline; filename="${path.basename(filePath)}"`,
             "Content-Length": stats.size,
             "Content-Type": "application/octet-stream",
+            "Access-Control-Expose-Headers": "Content-Disposition, Content-Length"
         });
 
         const stream = fs.createReadStream(filePath);

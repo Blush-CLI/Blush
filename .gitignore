@@ -2,4 +2,9 @@ build
 web/node_modules
 web/package-lock.json
 web/package.json
+web/cdn.getblush.xyz/files/
+web/cdn.getblush.xyz/installer/
 src/installer/dist
+src/installer/build
+src/installer/venv
+src/installer/installer_gui.spec
