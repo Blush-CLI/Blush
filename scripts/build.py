@@ -8,7 +8,7 @@ def buildBlush(src, args=None):
         if any(part in ["installer"] for part in root.split(os.sep)):
             continue
         for file in files:
-            if file.endswith((".cpp", ".h")):
+            if file.endswith((".cpp")):
                 cpp_files.append(os.path.join(root, file))
 
     build_dir = os.path.join(src, "..", "build", "debug-x64")
