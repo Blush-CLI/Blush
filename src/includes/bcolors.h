@@ -9,7 +9,13 @@
 #include <vector>
 
 enum class Color { Default, Black, Red, Green, Yellow, Blue, Magenta, Cyan, White };
-enum class Style { Default, Bold, Italic, Underline, Reversed };
+enum class Style {
+    Default   = 0,
+    Bold      = 1,
+    Italic    = 3,
+    Underline = 4,
+    Reversed  = 7
+};
 
 const std::vector<Color> allColors = {
     Color::Default, Color::Black, Color::Red, Color::Green,

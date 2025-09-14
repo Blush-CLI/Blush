@@ -19,7 +19,6 @@ std::string wd_title   = "Blush - Ready!";   // Default Startup Window name
 std::string t_process = "blush";             // Process name
 
 void sdwnofsu() {
-    _la_animgo("Setting window name");
 #ifdef _WIN32
     SetConsoleTitleA(wd_title.c_str());
 #elif __linux__

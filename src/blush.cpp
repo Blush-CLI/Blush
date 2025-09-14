@@ -66,17 +66,43 @@ char readSingleChar() {
 #endif
 }
 
-void updateCommandLine(const std::string& currentInput, size_t previousLength, int historyIndex, int processSize, int fileSize) {
+Color getCommandColor(const std::string& currentInput, const std::map<std::string, Command>& availableCommands) {
+    if (currentInput.empty()) {
+        return Color::Blue;
+    }
+    
+    if (currentInput[0] == '>') {
+        return Color::Yellow;
+    }
+    
+    std::istringstream inputStream(currentInput);
+    std::string commandName;
+    inputStream >> commandName;
+    
+    if (availableCommands.find(commandName) != availableCommands.end()) {
+        return Color::Green;
+    } else {
+        return Color::Red;
+    }
+}
+
+void updateCommandLine(const std::string& currentInput, size_t previousLength, int historyIndex, int processSize, int fileSize, const std::map<std::string, Command>& availableCommands) {
     std::cout << "\r";
     std::cout << std::string(previousLength + 40, ' ');
     std::cout << "\r";
 
     setColor(Color::Magenta);
     std::cout << "Blush >> ";
-    setColor(Color::Blue);
+    
+    Color inputColor = getCommandColor(currentInput, availableCommands);
+    setColor(inputColor);
     std::cout << currentInput;
 
-    if (historyIndex > 0) {
+    if (!currentInput.empty() && currentInput[0] == '>') {
+        setColor(Color::Yellow, {Style::Bold});
+        std::cout << "  [System CMD]";
+    }
+    else if (historyIndex > 0) {
         if (historyIndex <= processSize) {
             setColor(Color::Blue, {Style::Bold});
             std::cout << "  [History: Process]";
@@ -124,18 +150,19 @@ void runCommand(const std::string& userInput, std::vector<std::string>& processH
         }
 
         setColor(Color::Yellow, {Style::Bold});
-        std::cout << "System: ";
-        setColor(chosenColor, {Style::Default});
+        setColor(Color::Default, {Style::Default});
 
         std::string systemCommand = trimWhitespace(userInput.substr(1));
         if (!systemCommand.empty()) {
-            std::cout << "\n";
             system(systemCommand.c_str());
+            addHistory(userInput);
+            processHistory.push_back(userInput);
         } else {
             std::cout << "(Blush: no system command provided)\n";
+            addHistory(userInput);
+            processHistory.push_back(userInput);
         }
 
-        std::cout << "\n";
         return;
     }
 
@@ -147,6 +174,8 @@ void runCommand(const std::string& userInput, std::vector<std::string>& processH
         setColor(Color::Red);
         std::cerr << "> Unknown command!\n";
         setColor();
+        addHistory(userInput);
+        processHistory.push_back(userInput);
     }
 }
 
@@ -162,7 +191,7 @@ std::string getInput(std::map<std::string, Command>& availableCommands, std::vec
     int historyIndex = 0;
 
     toggleRawMode(true);
-    updateCommandLine(inputBuffer, previousLineLength, historyIndex, processSize, fileSize);
+    updateCommandLine(inputBuffer, previousLineLength, historyIndex, processSize, fileSize, availableCommands);
 
     while (true) {
         char keyPressed = readSingleChar();
@@ -228,7 +257,7 @@ std::string getInput(std::map<std::string, Command>& availableCommands, std::vec
             historyIndex = 0;
         }
 
-        updateCommandLine(inputBuffer, previousLineLength, historyIndex, processSize, fileSize);
+        updateCommandLine(inputBuffer, previousLineLength, historyIndex, processSize, fileSize, availableCommands);
         previousLineLength = inputBuffer.size();
     }
 
