@@ -7,6 +7,7 @@
 #include <iostream>
 #include "../includes/s_upu.h"
 #include "../includes/loanim.h"
+#include "../includes/cmd.h"
 
 #ifdef _WIN32
     #include <windows.h>
@@ -18,30 +19,28 @@
 std::string wd_title   = "Blush - Ready!";   // Default Startup Window name
 std::string t_process = "blush";             // Process name
 
+void loadAliasesFromConfig();
+
 void sdwnofsu() {
 #ifdef _WIN32
     SetConsoleTitleA(wd_title.c_str());
 #elif __linux__
-    // change process name
     prctl(PR_SET_NAME, t_process.c_str(), 0, 0, 0);
-    // change window name
     std::cout << "\033]0;" << wd_title << "\007";
     std::cout.flush();
 #endif
     _la_animstop();
-} // sdwsdwnofsut = Set default window name only for start up
+}
 
 void sdwt() {
 #ifdef _WIN32
     SetConsoleTitleA(wd_title.c_str());
 #elif __linux__
-    // change process name
     prctl(PR_SET_NAME, t_process.c_str(), 0, 0, 0);
-    // change window name
     std::cout << "\033]0;" << wd_title << "\007";
     std::cout.flush();
 #endif
-} // sdwt = Set default window name
+}
 
 void swn(std::string title) {
 #ifdef _WIN32
@@ -50,8 +49,9 @@ void swn(std::string title) {
     std::cout << "\033]0;" << title << "\007";
     std::cout.flush();
 #endif
-} // swn = Set window name
+}
 
 void startm() {
+    loadAliasesFromConfig();
     sdwnofsu();
-} // Execute on startup
+}

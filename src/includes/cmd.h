@@ -37,3 +37,6 @@ inline std::map<std::string, Command> commands = {
     {"update",  {selfUpdate, "Updates blush to the latest version"}},
     {"alias",   {c_alias,    "Manage command aliases"}},
 };
+
+void loadAliasesFromConfig();
+std::map<std::string, std::pair<std::string, std::string>>& getAliases();

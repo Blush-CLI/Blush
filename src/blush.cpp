@@ -29,6 +29,8 @@
 #include "./includes/historyhandler.h"
 #include "./includes/s_upu.h"
 
+std::map<std::string, std::pair<std::string, std::string>>& getAliases();
+
 void handleExit(int signal) {
     setColor(Color::Red);
     std::cout << "\nExiting\n";
@@ -79,7 +81,8 @@ Color getCommandColor(const std::string& currentInput, const std::map<std::strin
     std::string commandName;
     inputStream >> commandName;
     
-    if (availableCommands.find(commandName) != availableCommands.end()) {
+    auto& aliases = getAliases();
+    if (availableCommands.find(commandName) != availableCommands.end() || aliases.find(commandName) != aliases.end()) {
         return Color::Green;
     } else {
         return Color::Red;
@@ -166,6 +169,43 @@ void runCommand(const std::string& userInput, std::vector<std::string>& processH
         return;
     }
 
+    auto& aliases = getAliases();
+    auto aliasIt = aliases.find(commandName);
+    
+    if (aliasIt != aliases.end()) {
+        std::string actualCommand = aliasIt->second.first;
+        std::string executor = aliasIt->second.second;
+        
+        if (executor == "sys") {
+            std::string fullSystemCommand = actualCommand;
+            for (const auto& arg : arguments) {
+                fullSystemCommand += " " + arg;
+            }
+            
+            setColor(Color::Yellow, {Style::Bold});
+            std::cout << "[Alias -> System] ";
+            setColor(Color::Default, {Style::Default});
+            
+            system(fullSystemCommand.c_str());
+        } else if (executor == "b") {
+            if (commands.find(actualCommand) != commands.end()) {
+                setColor(Color::Green, {Style::Bold});
+                std::cout << "[Alias -> Blush] ";
+                setColor(Color::Default, {Style::Default});
+                
+                commands[actualCommand].func(arguments);
+            } else {
+                setColor(Color::Red);
+                std::cerr << "> Alias points to unknown Blush command: " << actualCommand << "\n";
+                setColor();
+            }
+        }
+        
+        addHistory(userInput);
+        processHistory.push_back(userInput);
+        return;
+    }
+
     if (!commandName.empty() && commands.find(commandName) != commands.end()) {
         commands[commandName].func(arguments);
         addHistory(userInput);
@@ -217,6 +257,14 @@ std::string getInput(std::map<std::string, Command>& availableCommands, std::vec
                         autocompleteMatches.push_back(commandPair.first);
                     }
                 }
+                
+                auto& aliases = getAliases();
+                for (const auto& aliasPair : aliases) {
+                    if (aliasPair.first.find(inputBuffer) == 0) {
+                        autocompleteMatches.push_back(aliasPair.first);
+                    }
+                }
+                
                 currentMatchIndex = 0;
             } else {
                 currentMatchIndex = (currentMatchIndex + 1) % autocompleteMatches.size();
