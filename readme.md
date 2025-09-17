@@ -1,5 +1,11 @@
 # Blush - CLI [IN DEVELOPMENT]
 
+![](https://img.shields.io/github/last-commit/Blush-CLI/Blush?&style=for-the-badge&color=FF6F61&logo=git&logoColor=FFFFFF&labelColor=2C2C2C)
+![](https://img.shields.io/github/stars/Blush-CLI/Blush?style=for-the-badge&logo=andela&color=6A5ACD&logoColor=FFFFFF&labelColor=2C2C2C)
+![](https://img.shields.io/github/repo-size/Blush-CLI/Blush?color=20B2AA&label=SIZE&logo=protondrive&style=for-the-badge&logoColor=FFFFFF&labelColor=2C2C2C)
+
+---
+
 > Blush - A CLI Written in C++, has own commands, system commands, history, etc.  
 > Designed for power users and developers who want control over their terminal, with modular commands, easy extensions, and advanced workflow tools.
 
