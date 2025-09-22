@@ -19,6 +19,8 @@ For installation head to our official [Website Home page](https://getblush.xyz/)
 
 # Screenshots
 
+!! KEEP IN MIND THAT THESE SCREENSHOTS ARE OUTDATED! !!
+
 With > Symbol you can run a system command in Blush
 
 <img width="728" height="114" alt="image" src="https://github.com/user-attachments/assets/5459ff0e-5160-4d32-948c-a56d9ce1f82f" />
