@@ -1,8 +1,11 @@
 # Blush - CLI [IN DEVELOPMENT]
 
 ![](https://img.shields.io/github/last-commit/Blush-CLI/Blush?style=for-the-badge&color=8AD7EB&logo=git&logoColor=FFFFFF&labelColor=1E202B)
+
 ![](https://img.shields.io/github/stars/Blush-CLI/Blush?style=for-the-badge&color=86DBD7&logo=andela&logoColor=FFFFFF&labelColor=1E202B)
+
 ![](https://img.shields.io/github/repo-size/Blush-CLI/Blush?style=for-the-badge&color=86DBCE&logo=protondrive&logoColor=FFFFFF&labelColor=1E202B)
+
 ![](https://img.shields.io/badge/Website-getblush.xyz-8AD7EB?style=for-the-badge&logo=globe&logoColor=FFFFFF&labelColor=1E202B)
 
 ---
