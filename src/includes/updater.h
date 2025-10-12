@@ -8,12 +8,31 @@
 #include <chrono>
 #include "../includes/loanim.h"
 #include "../includes/bcolors.h"
-
-// This mightnot work properly on all platforms
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
+#include <shlobj.h>
+#else
+#include <unistd.h>
+#include <pwd.h>
 #endif
+
+inline std::string getHomeDirectory() {
+#ifdef _WIN32
+    char path[MAX_PATH];
+    if(SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, path))) {
+        return std::string(path);
+    }
+    return "";
+#else
+    const char* home = getenv("HOME");
+    if(home) return std::string(home);
+    struct passwd* pw = getpwuid(getuid());
+    if(pw) return std::string(pw->pw_dir);
+    return "";
+#endif
+}
 
 inline std::string getExecutablePath() {
 #ifdef _WIN32
@@ -33,14 +52,17 @@ inline std::string getExecutablePath() {
 
 inline void selfUpdate(const std::vector<std::string>& args) {
 #ifdef _WIN32
-    std::string url = "https://cdn.getblush.xyz/blush-win-x64.exe";
-    std::string tmpFile = "blush-new.exe";
-    std::string exePath = getExecutablePath();
+    char tempPath[MAX_PATH];
+    GetTempPathA(MAX_PATH, tempPath);
+    std::string tmpZip = std::string(tempPath) + "blush-update.zip";
+    std::string url = "https://cdn.getblush.xyz/latest/blush-win-x64.zip";
+    std::string homeDir = getHomeDirectory();
+    std::string targetDir = homeDir + "\\.blush\\";
 
     setColor(Color::Cyan);
     _la_animgo("Preparing update");
     _la_anim_edit("Downloading update");
-    int res = system(("curl -s -L -o \"" + tmpFile + "\" \"" + url + "\"").c_str());
+    int res = system(("curl -s -L -o \"" + tmpZip + "\" \"" + url + "\"").c_str());
     if(res != 0) {
         _la_anim_edit("Download failed!");
         std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -49,15 +71,15 @@ inline void selfUpdate(const std::vector<std::string>& args) {
         return;
     }
 
-    std::ifstream f(tmpFile, std::ios::binary | std::ios::ate);
+    std::ifstream f(tmpZip, std::ios::binary | std::ios::ate);
     auto size = f.tellg();
     f.close();
-    if(size < 0.5 * 1024 * 1024) {
+    if(size < 512 * 1024) {
         _la_anim_edit("Update file not ready!");
         std::this_thread::sleep_for(std::chrono::seconds(2));
         _la_animstop();
         setColor(Color::Default);
-        std::filesystem::remove(tmpFile);
+        std::filesystem::remove(tmpZip);
         return;
     }
 
@@ -67,20 +89,21 @@ inline void selfUpdate(const std::vector<std::string>& args) {
     setColor(Color::Default);
     std::this_thread::sleep_for(std::chrono::milliseconds(800));
     setColor(Color::Yellow);
-    std::string script = "ping 127.0.0.1 -n 2 > nul & del \"" + exePath + "\" & rename \"" + tmpFile + "\" \"" + exePath + "\" & start \"\" \"" + exePath + "\"";
-    system(("cmd /C \"" + script + "\"").c_str());
+    system(("powershell -Command \"Expand-Archive -Force '" + tmpZip + "' '" + targetDir + "'\"").c_str());
+    system(("start \"\" \"" + targetDir + "blush.exe\"").c_str());
     setColor(Color::Default);
     exit(0);
 
 #else
-    std::string url = "https://cdn.getblush.xyz/blush-linux-x64";
-    std::string tmpFile = "blush-new";
-    std::string exePath = getExecutablePath();
+    std::string tmpZip = "/tmp/blush-update.zip";
+    std::string url = "https://cdn.getblush.xyz/latest/blush-linux-x64.zip";
+    std::string homeDir = getHomeDirectory();
+    std::string targetDir = homeDir + "/.blush/";
 
     setColor(Color::Cyan);
     _la_animgo("Preparing update");
     _la_anim_edit("Downloading update");
-    int res = system(("curl -s -L -o \"" + tmpFile + "\" \"" + url + "\"").c_str());
+    int res = system(("curl -s -L -o \"" + tmpZip + "\" \"" + url + "\"").c_str());
     if(res != 0) {
         _la_anim_edit("Download failed!");
         std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -89,15 +112,15 @@ inline void selfUpdate(const std::vector<std::string>& args) {
         return;
     }
 
-    std::ifstream f(tmpFile, std::ios::binary | std::ios::ate);
+    std::ifstream f(tmpZip, std::ios::binary | std::ios::ate);
     auto size = f.tellg();
     f.close();
-    if(size < 0.5 * 1024 * 1024) {
+    if(size < 512 * 1024) {
         _la_anim_edit("File not found on CDN!");
         std::this_thread::sleep_for(std::chrono::seconds(3));
         _la_animstop();
         setColor(Color::Default);
-        std::filesystem::remove(tmpFile);
+        std::filesystem::remove(tmpZip);
         return;
     }
 
@@ -107,10 +130,9 @@ inline void selfUpdate(const std::vector<std::string>& args) {
     setColor(Color::Default);
     std::this_thread::sleep_for(std::chrono::milliseconds(800));
     setColor(Color::Yellow);
-    system(("chmod +x \"" + tmpFile + "\"").c_str());
-    system(("rm \"" + exePath + "\"").c_str());
-    system(("mv \"" + tmpFile + "\" \"" + exePath + "\"").c_str());
-    system(("exec \"" + exePath + "\"").c_str());
+    system(("unzip -o \"" + tmpZip + "\" -d \"" + targetDir + "\"").c_str());
+    system(("chmod +x \"" + targetDir + "blush\"").c_str());
+    system(("exec \"" + targetDir + "blush\"").c_str());
     setColor(Color::Default);
     exit(0);
 #endif
