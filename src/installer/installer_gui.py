@@ -65,104 +65,6 @@ TRANSLATIONS = {
         "confirm_uninstall_title": "Confirm Uninstall",
         "confirm_uninstall_msg": "Are you sure you want to uninstall Blush? This will remove all files and shortcuts.",
         "error_prefix": "An error occurred:",
-    },
-    "es": {
-        "title": "Instalador de Blush",
-        "welcome": "Bienvenido al Instalador de Blush",
-        "description": "Este asistente le guiará a través de la instalación de Blush CLI.",
-        "next": "Siguiente",
-        "back": "Atrás",
-        "install": "Instalar",
-        "finish": "Finalizar",
-        "cancel": "Cancelar",
-        "license": "Acuerdo de Licencia",
-        "accept": "Acepto los términos del Acuerdo de Licencia",
-        "installing": "Instalando Blush...",
-        "download_progress": "Descargando: {progress}%",
-        "install_progress": "Instalando: {progress}%",
-        "complete": "¡Instalación Completa!",
-        "complete_msg": "Blush se ha instalado correctamente.",
-        "error": "Error de Instalación",
-        "select_lang": "Seleccionar Idioma:",
-        "options": "Opciones de Instalación",
-        "desktop_shortcut": "Crear acceso directo en el escritorio",
-        "start_menu_shortcut": "Crear acceso directo en el menú de inicio",
-        "reinstall": "Reinstalar (volver a descargar y reemplazar archivos)",
-        "select_action": "Seleccione una acción:",
-        "install_reinstall": "Instalar / Reinstalar",
-        "modify": "Modificar",
-        "uninstall": "Desinstalar",
-        "modification_complete": "¡Modificación Completa!",
-        "modification_msg": "Los cambios se han aplicado correctamente.",
-        "uninstallation_complete": "¡Desinstalación Completa!",
-        "uninstallation_msg": "Blush se ha desinstalado correctamente.",
-        "uninstalling": "Desinstalando Blush...",
-        "desktop_tooltip": "Crea un icono de acceso directo en su escritorio para un acceso rápido.",
-        "startmenu_tooltip": "Agrega Blush al menú de inicio de Windows.",
-        "reinstall_tooltip": "Vuelve a descargar y reemplaza los archivos de instalación existentes.",
-        "applying": "Aplicando cambios...",
-        "preparing": "Preparando...",
-        "extracting": "Extrayendo archivos...",
-        "installing_components": "Instalando componentes...",
-        "finalizing": "Finalizando instalación...",
-        "connecting": "Conectando al servidor de descarga...",
-        "downloading": "Descargando",
-        "download_complete": "Descarga completa. Instalando...",
-        "installation_complete": "¡Instalación completa!",
-        "uninstallation_complete_status": "¡Desinstalación completa!",
-        "modification_complete_status": "¡Modificación completa!",
-        "confirm_uninstall_title": "Confirmar Desinstalación",
-        "confirm_uninstall_msg": "¿Está seguro de que desea desinstalar Blush? Esto eliminará todos los archivos y accesos directos.",
-        "error_prefix": "Ocurrió un error:",
-    },
-    "pl": {
-        "title": "Instalator Blush",
-        "welcome": "Witamy w Instalatorze Blush",
-        "description": "Ten kreator poprowadzi Cię przez instalację Blush CLI.",
-        "next": "Dalej",
-        "back": "Wstecz",
-        "install": "Instaluj",
-        "finish": "Zakończ",
-        "cancel": "Anuluj",
-        "license": "Umowa Licencyjna",
-        "accept": "Akceptuję warunki Umowy Licencyjnej",
-        "installing": "Instalowanie Blush...",
-        "download_progress": "Pobieranie: {progress}%",
-        "install_progress": "Instalowanie: {progress}%",
-        "complete": "Instalacja Zakończona!",
-        "complete_msg": "Blush został pomyślnie zainstalowany.",
-        "error": "Błąd Instalacji",
-        "select_lang": "Wybierz Język:",
-        "options": "Opcje Instalacji",
-        "desktop_shortcut": "Utwórz skrót na pulpicie",
-        "start_menu_shortcut": "Utwórz skrót w menu Start",
-        "reinstall": "Reinstaluj (pobierz ponownie i zastąp pliki)",
-        "select_action": "Wybierz akcję:",
-        "install_reinstall": "Instaluj / Reinstaluj",
-        "modify": "Modyfikuj",
-        "uninstall": "Odinstaluj",
-        "modification_complete": "Modyfikacja Zakończona!",
-        "modification_msg": "Zmiany zostały pomyślnie zastosowane.",
-        "uninstallation_complete": "Odinstalowanie Zakończone!",
-        "uninstallation_msg": "Blush został pomyślnie odinstalowany.",
-        "uninstalling": "Odinstalowywanie Blush...",
-        "desktop_tooltip": "Tworzy ikonę skrótu na pulpicie dla szybkiego dostępu.",
-        "startmenu_tooltip": "Dodaje Blush do menu Start w systemie Windows.",
-        "reinstall_tooltip": "Pobiera ponownie i zastępuje istniejące pliki instalacyjne.",
-        "applying": "Zastosowanie zmian...",
-        "preparing": "Przygotowywanie...",
-        "extracting": "Wyodrębnianie plików...",
-        "installing_components": "Instalowanie komponentów...",
-        "finalizing": "Finalizowanie instalacji...",
-        "connecting": "Łączenie z serwerem pobierania...",
-        "downloading": "Pobieranie",
-        "download_complete": "Pobieranie zakończone. Instalowanie...",
-        "installation_complete": "Instalacja zakończona!",
-        "uninstallation_complete_status": "Odinstalowanie zakończone!",
-        "modification_complete_status": "Modyfikacja zakończona!",
-        "confirm_uninstall_title": "Potwierdź Odinstalowanie",
-        "confirm_uninstall_msg": "Czy na pewno chcesz odinstalować Blush? To usunie wszystkie pliki i skróty.",
-        "error_prefix": "Wystąpił błąd:",
     }
 }
 
@@ -834,8 +736,8 @@ class InstallerWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         locale.setlocale(locale.LC_ALL, '')
-        default_locale = locale.getlocale()
-        sys_lang = default_locale[0][:2] if default_locale[0] else 'en'
+        default_locale = locale.getdefaultlocale()
+        sys_lang = default_locale[0].split('_')[0] if default_locale[0] else 'en'
         self.current_lang = sys_lang if sys_lang in TRANSLATIONS else 'en'
         self.system_type = platform.system()
         self.download_thread = None
@@ -846,7 +748,17 @@ class InstallerWindow(QMainWindow):
         self.blush_dir = Path.home() / ".blush"
         self.installed = self.blush_dir.exists()
         self.lang_to_code = {}
-        self.lang_to_country = {"en": "us", "es": "es", "pl": "pl"}
+        self.lang_to_country = {
+            "en": "us", "es": "es", "pl": "pl", "fr": "fr", "de": "de",
+            "it": "it", "pt": "pt", "ru": "ru", "zh": "cn", "ja": "jp",
+            "ko": "kr", "ar": "sa", "hi": "in", "bn": "bd", "tr": "tr",
+            "nl": "nl", "sv": "se", "no": "no", "da": "dk", "fi": "fi",
+            "el": "gr", "he": "il", "id": "id", "ms": "my", "th": "th",
+            "vi": "vn", "uk": "ua", "cs": "cz", "hu": "hu", "ro": "ro",
+            "sk": "sk", "sl": "si", "bg": "bg", "hr": "hr", "sr": "rs",
+            "lt": "lt", "lv": "lv", "et": "ee", "fa": "ir", "ur": "pk",
+            "tl": "ph", "sw": "ke"
+        }
         
         self.setWindowTitle(self.tr("title"))
         self.setFixedSize(700, 550)
@@ -865,7 +777,17 @@ class InstallerWindow(QMainWindow):
         return text
     
     def get_lang_name(self, lang):
-        names = {"en": "English", "es": "Español", "pl": "Polski"}
+        names = {
+            "en": "English", "es": "Español", "pl": "Polski", "fr": "Français", "de": "Deutsch",
+            "it": "Italiano", "pt": "Português", "ru": "Русский", "zh": "中文", "ja": "日本語",
+            "ko": "한국어", "ar": "العربية", "hi": "हिन्दी", "bn": "বাংলা", "tr": "Türkçe",
+            "nl": "Nederlands", "sv": "Svenska", "no": "Norsk", "da": "Dansk", "fi": "Suomi",
+            "el": "Ελληνικά", "he": "עברית", "id": "Bahasa Indonesia", "ms": "Bahasa Melayu", "th": "ไทย",
+            "vi": "Tiếng Việt", "uk": "Українська", "cs": "Čeština", "hu": "Magyar", "ro": "Română",
+            "sk": "Slovenčina", "sl": "Slovenščina", "bg": "Български", "hr": "Hrvatski", "sr": "Српски",
+            "lt": "Lietuvių", "lv": "Latviešu", "et": "Eesti", "fa": "فارسی", "ur": "اردو",
+            "tl": "Wikang Tagalog", "sw": "Kiswahili"
+        }
         return names.get(lang, lang.upper())
     
     def _change_language(self, item_text):
@@ -1365,7 +1287,7 @@ class InstallerWindow(QMainWindow):
     
     def fetch_translations(self):
         self.trans_manager = QNetworkAccessManager(self)
-        url = "https://cdn.getblush.xyz/translations_getblush.json"
+        url = "https://cdn.getblush.xyz/installer/translations.json"
         req = QNetworkRequest(QUrl(url))
         reply = self.trans_manager.get(req)
         reply.finished.connect(self._on_trans_fetched)
