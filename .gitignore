@@ -3,3 +3,5 @@ web/node_modules
 web/package-lock.json
 web/package.json
 src/installer/dist
+src/installer/build
+src/installer/*.spec
