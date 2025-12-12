@@ -16,6 +16,7 @@ struct Command {
 
 void c_cls(const std::vector<std::string>& args = {});
 void c_help(const std::vector<std::string>& args = {});
+void c_cd(const std::vector<std::string>& args = {});
 void c_quit(const std::vector<std::string>& args = {});
 void c_color(const std::vector<std::string>& args = {});
 void c_history(const std::vector<std::string>& args = {});
@@ -23,6 +24,7 @@ void c_sinfo(const std::vector<std::string>& args = {});
 void c_version(const std::vector<std::string>& args = {});
 
 inline std::map<std::string, Command> commands = {
+    {"cd",      {c_cd,      "Changes the current directory"}},
     {"cls",     {c_cls,     "Clears the terminal screen"}},
     {"clear",   {c_cls,     "Clears the terminal screen"}},
     {"help",    {c_help,    "Displays all built-in commands"}},
