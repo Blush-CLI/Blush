@@ -7,6 +7,19 @@ set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_library(Utils STATIC
+    src/utils/file.cpp
+)
+target_include_directories(Utils PRIVATE
+    include
+    src
+)
+
 add_executable(Blush
     src/main.cpp
+)
+target_link_libraries(Blush PRIVATE Utils)
+target_include_directories(Blush PRIVATE
+    include
+    src
 )
