@@ -46,10 +46,5 @@ sinfo - Seems useless, but it's just cool to see the specs of your PC in Blush!
 # Website
 > https://getblush.xyz/
 
-# Contribute
-> If you want to make Blush too, please contact me on discord:
-> 
-> Username: `4raynixx`
-
-# Ending
-> Have fun using Blush, appreciate all stars!
+# Contributors
+![](https://contrib.rocks/image?repo=Blush-CLI/Blush)
