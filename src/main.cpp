@@ -1,12 +1,12 @@
 #include <print>
+#include <iostream>
+#include <cstdlib>
+#include <cstdio>
 #include <filesystem>
+#include <core/shell.hpp>
 #include <utils/file.hpp>
 
 int main() {
-    // FIRST: we have to make a skeleton (tree) how the structure of files and folders will look
-
-    /*
-    */
-    std::print("{}\n> ", File::lcwd());
+    Shell shell;
     return 0;
 }

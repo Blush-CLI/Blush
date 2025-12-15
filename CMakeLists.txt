@@ -9,16 +9,28 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(Utils STATIC
     src/utils/file.cpp
+    src/utils/string.cpp
 )
 target_include_directories(Utils PRIVATE
     include
     src
 )
 
+add_library(Core STATIC
+    src/core/command.cpp
+    src/core/shell.cpp
+)
+target_include_directories(Core PRIVATE
+    include
+    src
+)
+target_link_libraries(Core PRIVATE Utils)
+
 add_executable(Blush
     src/main.cpp
 )
-target_link_libraries(Blush PRIVATE Utils)
+
+target_link_libraries(Blush PRIVATE Utils Core)
 target_include_directories(Blush PRIVATE
     include
     src
