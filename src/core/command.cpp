@@ -21,10 +21,8 @@ T takeFirst(std::span<T>& s){
 Command::Command(const std::string& command){
     // split spaces (echo hello world => ["echo", "hello", "world"])
     auto splitUp = String::splitSpaces(command);
-    
-    std::span<std::string> s{splitUp};
-    std::string commandName = takeFirst(s);
 
     this->arguments = splitUp;
-    this->mainCommand = commandName;
+    this->mainCommand = splitUp[0];
+    this->fullCommand = command;
 }

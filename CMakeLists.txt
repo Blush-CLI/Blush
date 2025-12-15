@@ -11,6 +11,7 @@ add_library(Utils STATIC
     src/utils/file.cpp
     src/utils/string.cpp
 )
+
 target_include_directories(Utils PRIVATE
     include
     src
@@ -19,6 +20,7 @@ target_include_directories(Utils PRIVATE
 add_library(Core STATIC
     src/core/command.cpp
     src/core/shell.cpp
+    src/core/job/windows.cpp
 )
 target_include_directories(Core PRIVATE
     include
@@ -26,11 +28,22 @@ target_include_directories(Core PRIVATE
 )
 target_link_libraries(Core PRIVATE Utils)
 
+add_library(Commands STATIC
+    src/commands/echo.cpp
+    src/commands/cd.cpp
+)
+
+target_include_directories(Commands PRIVATE
+    include
+    src
+)
+target_link_libraries(Commands PRIVATE Utils Core)
+
 add_executable(Blush
     src/main.cpp
 )
 
-target_link_libraries(Blush PRIVATE Utils Core)
+target_link_libraries(Blush PRIVATE Utils Core Commands)
 target_include_directories(Blush PRIVATE
     include
     src

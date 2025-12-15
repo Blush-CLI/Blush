@@ -8,8 +8,8 @@ enum class SaveFlags {
     // in normal blush you had json config, this is binary config :pray: its smaller in size plus our own format
 };
 
-struct SaveFile { // we doing binary (scary frfr)
-    uint64_t magic = 0xdeadcafe; // dead cafe fr
+struct SaveFile {
+    uint64_t magic = 0xdeadcafe;
 
     uint8_t versionHigh, versionMid, versionLow; // 1.0.0 like
 
