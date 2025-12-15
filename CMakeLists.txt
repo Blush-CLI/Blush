@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(Utils STATIC
     src/utils/file.cpp
     src/utils/string.cpp
+    src/utils/input/windows.cpp
 )
 
 target_include_directories(Utils PRIVATE
@@ -20,8 +21,14 @@ target_include_directories(Utils PRIVATE
 add_library(Core STATIC
     src/core/command.cpp
     src/core/shell.cpp
-    src/core/job/windows.cpp
 )
+
+if(WIN32)
+    target_sources(Core PRIVATE src/core/job/windows.cpp)
+else()
+    target_sources(Core PRIVATE src/core/job/posix.cpp)
+endif()
+
 target_include_directories(Core PRIVATE
     include
     src
@@ -30,6 +37,8 @@ target_link_libraries(Core PRIVATE Utils)
 
 add_library(Commands STATIC
     src/commands/echo.cpp
+    src/commands/clear.cpp
+    src/commands/exit.cpp
     src/commands/cd.cpp
 )
 

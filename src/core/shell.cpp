@@ -2,44 +2,41 @@
 #include <core/shell.hpp>
 #include <core/job.hpp>
 #include <utils/file.hpp>
+#include <utils/input.hpp>
+#include <tui/colors.hpp>
+#include <cstdlib>
 #include <iostream>
 #include <queue>
 #include <print>
 #include <blush.hpp>
 
-std::queue<Command> commandQueue;
-std::mutex commandExecution;
-
-void runnerThreadCode() {
-    while(true){
-        std::lock_guard guard(commandExecution);
-        if(commandQueue.empty()) continue;
-
-        auto current = commandQueue.front();
-
-        system(current.fullCommand.c_str());
-
-        commandQueue.pop();
-    }
-}
-
-Shell::Shell() {
-    std::println("Welcome to Blush!");
+Shell::Shell() { // Colors:
+    std::println("{}[  OK  ]{} Shell initialized!{}",
+        Color::Green, 
+        Color::Purple,
+        Color::Reset); // systemd style fr
     run();
 }
 
 void Shell::run() {
+    Input input;
     while(true){
-        std::print("[{}] > ", File::lcwd());
+        std::print("{}[{}]{} {}> {}",Color::Purple, File::lcwd(), Color::Purple, Color::Blue, Color::Reset);
         std::string command;
-
-        while(!std::getline(std::cin, command));
-
+        while(char c = std::getchar()){
+            switch(c + 'A' - 1){
+                case 'Q':
+                    exit(0);
+            }
+            if(c == '\n') break;
+            command += c;
+        }
         try {
             if(command.empty()) continue; // if command is empty restart the loop
             
-            D_PRINTLN("Running - Command: {}", command);
             Command cmd(command);
+
+            if(cmd.mainCommand == "exit") exit(0);
             
             if(map.find(cmd.mainCommand) != map.end()) {
                 map[cmd.mainCommand].func(cmd);
@@ -54,10 +51,6 @@ void Shell::run() {
             std::println("An error occured: {}", e.what());
         }
     }
-}
-
-void Shell::createRunnerThread() {
-    // thread = std::jthread(runnerThreadCode);
 }
 
 Shell::~Shell() {

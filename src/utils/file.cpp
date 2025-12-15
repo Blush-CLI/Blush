@@ -16,7 +16,6 @@ namespace File {
         return ss.str();
     }
     
-    // what's lcwd : 
     std::string lcwd() {
         auto currentPath = std::filesystem::current_path(); // eg C:\Users\Raynixx\Documents\Codes\blush_revived\build
         return currentPath.filename().string(); // currentPath.filename() = build; .string turns it to a string

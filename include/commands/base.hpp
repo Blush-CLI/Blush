@@ -8,6 +8,8 @@
 namespace Commands {
     int echo(Command command);
     int cd(Command command);
+    int clear(Command command);
+    int exit(Command command);
 }
 
 struct Builtin {
@@ -18,4 +20,7 @@ struct Builtin {
 static std::unordered_map<std::string, Builtin> map = {
     {"echo", {Commands::echo, "Prints text to the screen."}},
     {"cd", {Commands::cd, "Change current directory."}},
+    {"clear", {Commands::clear, "Clears the screen."}},
+    {"cls", {Commands::clear, "Clears the screen."}},
+    {"q", {Commands::exit, "Exists Blush."}},
 };
