@@ -155,6 +155,7 @@ int Shell::run() {
                 Job job(command);
                 bool result = job.run();
                 if(!result) {
+                    audio.play("music/error.ogg");
                     std::println("{}Error: '{}{}{}{}' | Command not found. \
                         \n{}> Exit code: {}",
                         Color::Red, Color::Bold, cmd.mainCommand, Color::Reset, Color::Red, Color::Yellow, job.exitCode);

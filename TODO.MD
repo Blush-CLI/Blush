@@ -23,5 +23,5 @@ blush_revived
 - Input handler [x]
 - History (Like in old Blush) [x]
 - Read & Execute Compiled Blush Scripts []
-- Play Sounds with MPV Library []
-- Play Error Sound on Error []
+- Play Sounds [x]
+- Play Error Sound on Error [x]
