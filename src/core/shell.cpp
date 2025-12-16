@@ -10,27 +10,108 @@
 #include <print>
 #include <blush.hpp>
 
-Shell::Shell() { // Colors:
+void Shell::Init() { // Colors:
     std::println("{}[  OK  ]{} Shell initialized!{}",
         Color::Green, 
         Color::Purple,
         Color::Reset); // systemd style fr
-    run();
+    int rcode = run();
+    D_PRINTLN("Shell process exited with code {}", rcode);
 }
 
-void Shell::run() {
-    Input input;
+void printPrompt() {
+    std::cout
+            << Color::Purple
+            << "["
+            << File::lcwd()
+            << "]"
+            << " "
+            << Color::Blue
+            << "> "
+            << Color::Reset
+            << std::flush;
+}
+
+int Shell::run() {
     while(true){
-        std::print("{}[{}]{} {}> {}",Color::Purple, File::lcwd(), Color::Purple, Color::Blue, Color::Reset);
-        std::string command;
-        command.clear();
-        while(char c = std::getchar()){
-            switch(c + 'A' - 1){
-                case 'Q':
-                    exit(0);
+        printPrompt();
+        std::string command; // it sounds like a kick
+        bool escaped = false;
+        bool replace = true;
+        int curPos = 0;
+
+        while(true){
+            Char c = Input::readkey();
+            bool done = false;
+            switch(c.escape) {
+                case EscapeKey::Escape: {
+                    escaped = true;
+                    std::cout << "\x1b[2K\r[ESCAPE] i: input | r: replace" << std::flush;
+                } break; // can u try running this on real console and test escape
+                case EscapeKey::UpArrow: {} break;
+                case EscapeKey::DownArrow: {} break;
+                case EscapeKey::LeftArrow: {
+                    if(curPos > 0) {
+                        std::cout << "\b";
+                        curPos--;
+                    }
+                } break;
+                case EscapeKey::RightArrow: {
+                    if(curPos < command.size()) {
+                        std::cout << "\x1b[C";
+                        curPos++;
+                    }
+                } break;
+                case EscapeKey::Backspace: {
+                    if(curPos > 0) {
+                        command.pop_back();
+                        curPos--;
+                        std::print("\b \b");
+                    }
+                } break;
+
+                default: {
+
+                    if(escaped) {
+                        switch(c.character) {
+                            case 'i':
+                            case 'I':
+                                replace = false;
+                                escaped = false;
+                                std::cout << "\x1b[2K\r" << std::flush;
+                                printPrompt();
+                                std::cout << command;
+                            break;
+                                
+                            case 'r':
+                            case 'R':
+                                replace = true;
+                                escaped = false;
+                                std::cout << "\x1b[2K\r" << std::flush;
+                                printPrompt();
+                                std::cout << command;
+                            break;
+                        }
+                        break;
+                    }
+
+                    switch(c.character + 'A' - 1){
+                        case 'Q': // Ctrl + Q  
+                            std::println();
+                            exit(0);
+                    }
+        
+                    if(c.character == '\n' || (c.character == '\r')) {
+                        std::println();
+                        done = true;
+                        break;
+                    }
+        
+                    command += c.character;
+                    std::cout << c.character << std::flush; // yes backspace is still something
+                }
             }
-            if(c == '\n') break;
-            command += c;
+            if(done) break;
         }
 
         try {
@@ -55,6 +136,7 @@ void Shell::run() {
             std::println("An error occured: {}", e.what());
         }
     }
+    return 0;
 }
 
 Shell::~Shell() {

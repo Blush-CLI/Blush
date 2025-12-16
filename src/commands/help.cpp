@@ -11,11 +11,11 @@ std::map<std::string, std::string_view> Texts = {
 namespace Commands {
     int help(Command command){
         for (auto Text = Texts.rbegin(); Text != Texts.rend(); ++Text) {
-            std::print("{}{}\n", Text->second, Text->first);
+            std::println("{}{}", Text->second, Text->first);
         } // Print Strings from Texts Map with thier Color
 
         for (auto& [name, exp] : commands_map) {
-            std::print("{}   - {} / {}\n", Color::Bold, name, exp.description);
+            std::println("{}   - {} / {}", Color::Bold, name, exp.description);
         } // Print Commands with thier Description
         
         return 0;

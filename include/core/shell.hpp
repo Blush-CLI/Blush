@@ -10,13 +10,13 @@ public:
 		/**
 			* Main Shell class - contains all abstracted functions to run and use Blush
 		 */
-		Shell();
+		void Init();
 
 		/**	
 			* Run the shell
 			* @returns `void`
 		 */
-		void run();
+		int run();
 		
 		/**
 			* Shell cleanup and pre-exit state
