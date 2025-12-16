@@ -11,6 +11,7 @@ namespace Commands {
     int clear(Command command);
     int exit(Command command);
     int help(Command command);
+    int history(Command command);
 }
 
 struct Builtin {
@@ -25,4 +26,5 @@ static std::unordered_map<std::string, Builtin> commands_map = {
     {"cls", {Commands::clear, "Clears the screen."}},
     {"q", {Commands::exit, "Exists Blush."}},
     {"help", {Commands::help, "Displays help instructions."}},
+    {"history", {Commands::history, "Displays command history."}},
 };

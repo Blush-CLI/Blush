@@ -10,8 +10,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(Utils STATIC
     src/utils/file.cpp
     src/utils/string.cpp
-    src/utils/input/windows.cpp
 )
+
+if(WIN32)
+    target_sources(Utils PRIVATE src/utils/input/windows.cpp)
+else()
+    target_sources(Utils PRIVATE src/utils/input/posix.cpp)
+endif()
+
 
 target_include_directories(Utils PRIVATE
     include
@@ -21,6 +27,7 @@ target_include_directories(Utils PRIVATE
 add_library(Core STATIC
     src/core/command.cpp
     src/core/shell.cpp
+    src/core/history.cpp
 )
 
 if(WIN32)
@@ -41,6 +48,7 @@ add_library(Commands STATIC
     src/commands/exit.cpp
     src/commands/cd.cpp
     src/commands/help.cpp
+    src/commands/history.cpp
 )
 
 target_include_directories(Commands PRIVATE

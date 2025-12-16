@@ -21,7 +21,7 @@ blush_revived
 
 - Basic dir handling [x]
 - Input handler [x]
-- History (Like in old Blush) []
+- History (Like in old Blush) [x]
 - Read & Execute Compiled Blush Scripts []
 - Play Sounds with MPV Library []
 - Play Error Sound on Error []

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "command.hpp"
+#include "history.hpp"
 #include <string>
 #include <mutex>
 #include <thread>
@@ -22,10 +23,12 @@ public:
 			* Shell cleanup and pre-exit state
 		 */
 		~Shell();
+
+		static History* getHistory();
 private:
-	void createRunnerThread();
 	std::string fullWorkingPath;
 	std::mutex commandExecution;
 	std::jthread thread;
-	// we'll put some state here later
+	History history;
+	static History* currentHistory;
 };

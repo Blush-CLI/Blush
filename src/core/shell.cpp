@@ -1,6 +1,7 @@
 #include <commands/base.hpp>
 #include <core/shell.hpp>
 #include <core/job.hpp>
+#include <core/history.hpp>
 #include <utils/file.hpp>
 #include <utils/input.hpp>
 #include <tui/colors.hpp>
@@ -10,13 +11,20 @@
 #include <print>
 #include <blush.hpp>
 
-void Shell::Init() { // Colors:
+History* Shell::currentHistory = nullptr;
+
+void Shell::Init() {
+    currentHistory = &history;
     std::println("{}[  OK  ]{} Shell initialized!{}",
         Color::Green, 
         Color::Purple,
-        Color::Reset); // systemd style fr
+        Color::Reset);
     int rcode = run();
     D_PRINTLN("Shell process exited with code {}", rcode);
+}
+
+History* Shell::getHistory() {
+    return currentHistory;
 }
 
 void printPrompt() {
@@ -48,8 +56,24 @@ int Shell::run() {
                     escaped = true;
                     std::cout << "\x1b[2K\r[ESCAPE] i: input | r: replace" << std::flush;
                 } break; // can u try running this on real console and test escape
-                case EscapeKey::UpArrow: {} break;
-                case EscapeKey::DownArrow: {} break;
+                case EscapeKey::UpArrow: {
+                    std::string histCmd = history.getPrevious();
+                    if(!histCmd.empty()) {
+                        std::cout << "\x1b[2K\r" << std::flush;
+                        printPrompt();
+                        command = histCmd;
+                        curPos = command.size();
+                        std::cout << command << std::flush;
+                    }
+                } break;
+                case EscapeKey::DownArrow: {
+                    std::string histCmd = history.getNext();
+                    std::cout << "\x1b[2K\r" << std::flush;
+                    printPrompt();
+                    command = histCmd;
+                    curPos = command.size();
+                    std::cout << command << std::flush;
+                } break;
                 case EscapeKey::LeftArrow: {
                     if(curPos > 0) {
                         std::cout << "\b";
@@ -115,7 +139,10 @@ int Shell::run() {
         }
 
         try {
-            if(command.empty()) continue; // if command is empty restart the loop
+            if(command.empty()) continue;
+            
+            history.add(command);
+            history.reset();
             
             Command cmd(command);
 
