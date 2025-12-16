@@ -23,6 +23,7 @@ void Shell::run() {
     while(true){
         std::print("{}[{}]{} {}> {}",Color::Purple, File::lcwd(), Color::Purple, Color::Blue, Color::Reset);
         std::string command;
+        command.clear();
         while(char c = std::getchar()){
             switch(c + 'A' - 1){
                 case 'Q':
@@ -31,6 +32,7 @@ void Shell::run() {
             if(c == '\n') break;
             command += c;
         }
+
         try {
             if(command.empty()) continue; // if command is empty restart the loop
             
@@ -38,13 +40,13 @@ void Shell::run() {
 
             if(cmd.mainCommand == "exit") exit(0);
             
-            if(map.find(cmd.mainCommand) != map.end()) {
-                map[cmd.mainCommand].func(cmd);
+            if(commands_map.find(cmd.mainCommand) != commands_map.end()) {
+                commands_map[cmd.mainCommand].func(cmd);
             } else {
                 Job job(command);
                 bool result = job.run();
                 if(!result) {
-                    std::println("Error: Command not found.\n Exit code: {}", job.exitCode); // hmm
+                    std::println("Error: '{}', Command not found.\n Exit code: {}", command ,job.exitCode);
                 } // alt up arrow
             }
         } catch (std::exception& e) {

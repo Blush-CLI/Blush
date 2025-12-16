@@ -40,6 +40,7 @@ add_library(Commands STATIC
     src/commands/clear.cpp
     src/commands/exit.cpp
     src/commands/cd.cpp
+    src/commands/help.cpp
 )
 
 target_include_directories(Commands PRIVATE

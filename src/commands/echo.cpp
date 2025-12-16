@@ -6,10 +6,10 @@
 
 namespace Commands {
     int echo(Command command){
-        D_PRINTLN("yes bro");
+        D_PRINTLN("Attempting to print...");
         bool a = false;
         for(auto& arg : command.arguments) {
-            if(!a) {
+            if(!a) { // skip command name
                 a = true;
                 continue;
             }
