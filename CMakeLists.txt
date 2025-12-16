@@ -1,15 +1,16 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(BlushCLI)
-set(CMAKE_C_COMPILER gcc)
-set(CMAKE_CXX_COMPILER g++)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_subdirectory(outside/miniaudio)
+
 add_library(Utils STATIC
     src/utils/file.cpp
     src/utils/string.cpp
+    src/utils/audio.cpp
 )
 
 if(WIN32)
@@ -22,6 +23,11 @@ endif()
 target_include_directories(Utils PRIVATE
     include
     src
+    outside/miniaudio
+)
+
+target_link_libraries(Utils PRIVATE
+    miniaudio
 )
 
 add_library(Core STATIC

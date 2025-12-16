@@ -2,6 +2,7 @@
 
 #include "command.hpp"
 #include "history.hpp"
+#include <utils/audio.hpp>
 #include <string>
 #include <mutex>
 #include <thread>
@@ -26,6 +27,7 @@ public:
 
 		static History* getHistory();
 private:
+	Audio audio;
 	std::string fullWorkingPath;
 	std::mutex commandExecution;
 	std::jthread thread;

@@ -41,6 +41,7 @@ void printPrompt() {
 }
 
 int Shell::run() {
+    audio.play("music/maybe_blush.ogg");
     while(true){
         printPrompt();
         std::string command; // it sounds like a kick
