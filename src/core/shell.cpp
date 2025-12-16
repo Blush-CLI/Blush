@@ -46,7 +46,9 @@ void Shell::run() {
                 Job job(command);
                 bool result = job.run();
                 if(!result) {
-                    std::println("Error: '{}', Command not found.\n Exit code: {}", command ,job.exitCode);
+                    std::println("{}Error: '{}{}{}{}' | Command not found. \
+                        \n{}> Exit code: {}",
+                        Color::Red, Color::Bold, cmd.mainCommand, Color::Reset, Color::Red, Color::Yellow, job.exitCode);
                 } // alt up arrow
             }
         } catch (std::exception& e) {
