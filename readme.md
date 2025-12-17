@@ -15,7 +15,7 @@
 
 ![Blush Banner](https://repository-images.githubusercontent.com/1021183835/2cfd8f2d-6a36-4c34-bf1b-e01f6bf0d41e)
 # Installation
-For installation head to our official [Website Home page](https://getblush.xyz/). If you don't know how to download it still, you can read this installation Guide on our [Docs Page](https://docs.getblush.xyz/getstarted/installation).
+For installation instructions, head to our official [Website Home page](https://getblush.xyz/). If you don't know how to download it still, you can read this installation Guide on our [Docs Page](https://docs.getblush.xyz/getstarted/installation).
 
 # Screenshots
 
