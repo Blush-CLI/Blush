@@ -47,4 +47,4 @@ sinfo - Seems useless, but it's just cool to see the specs of your PC in Blush!
 > https://getblush.xyz/
 
 # Contributors
-![](https://contrib.rocks/image?repo=Blush-CLI/Blush)
+![Contributors](https://contrib.rocks/image?repo=Blush-CLI/Blush)
