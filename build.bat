@@ -3,5 +3,5 @@
 mkdir build
 cd build
 cmake ..
-cmake --build .
+cmake --build . --parallel 8
 echo "Build complete!"

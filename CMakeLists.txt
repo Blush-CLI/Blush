@@ -44,6 +44,7 @@ endif()
 
 target_include_directories(Core PRIVATE
     include
+    outside/miniaudio
     src
 )
 target_link_libraries(Core PRIVATE Utils)
@@ -51,6 +52,7 @@ target_link_libraries(Core PRIVATE Utils)
 add_library(Commands STATIC
     src/commands/echo.cpp
     src/commands/clear.cpp
+    src/commands/play.cpp
     src/commands/exit.cpp
     src/commands/cd.cpp
     src/commands/help.cpp
@@ -60,6 +62,7 @@ add_library(Commands STATIC
 target_include_directories(Commands PRIVATE
     include
     src
+    outside/miniaudio
 )
 target_link_libraries(Commands PRIVATE Utils Core)
 
@@ -71,4 +74,5 @@ target_link_libraries(Blush PRIVATE Utils Core Commands)
 target_include_directories(Blush PRIVATE
     include
     src
-)
+    outside/miniaudio
+) # to what?

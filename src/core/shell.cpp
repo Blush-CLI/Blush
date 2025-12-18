@@ -10,10 +10,11 @@
 #include <queue>
 #include <print>
 #include <blush.hpp>
-
+extern Audio audio;
 History* Shell::currentHistory = nullptr;
 
 void Shell::Init() {
+    this->audio = &::audio;
     currentHistory = &history;
     std::println("{}[  OK  ]{} Shell initialized!{}",
         Color::Green, 
@@ -41,7 +42,7 @@ void printPrompt() {
 }
 
 int Shell::run() {
-    audio.play("music/maybe_blush.ogg");
+    audio->play("./music/jump.wav");
     while(true){
         printPrompt();
         std::string command; // it sounds like a kick
@@ -155,7 +156,7 @@ int Shell::run() {
                 Job job(command);
                 bool result = job.run();
                 if(!result) {
-                    audio.play("music/error.ogg");
+                    audio->play("C:\\Users\\Raynixx\\Documents\\Codes\\blush_revived\\music\\jump.wav");
                     std::println("{}Error: '{}{}{}{}' | Command not found. \
                         \n{}> Exit code: {}",
                         Color::Red, Color::Bold, cmd.mainCommand, Color::Reset, Color::Red, Color::Yellow, job.exitCode);

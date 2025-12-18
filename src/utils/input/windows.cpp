@@ -22,6 +22,8 @@ std::string Input::readamount(int n) {
     for(int i = 0; i < n; i++) {
         result += readchar();
     }
+
+    return result;
 }
 
 Char Input::readkey() {

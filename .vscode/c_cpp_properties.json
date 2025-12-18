@@ -9,7 +9,8 @@
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "_WIN32"
             ],
             "windowsSdkVersion": "10.0.26100.0",
             "compilerPath": "g++.exe",

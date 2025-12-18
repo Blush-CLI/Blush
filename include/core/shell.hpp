@@ -2,7 +2,7 @@
 
 #include "command.hpp"
 #include "history.hpp"
-#include <utils/audio.hpp>
+#include <audio/audio.hpp>
 #include <string>
 #include <mutex>
 #include <thread>
@@ -26,8 +26,8 @@ public:
 		~Shell();
 
 		static History* getHistory();
+		Audio* audio;
 private:
-	Audio audio;
 	std::string fullWorkingPath;
 	std::mutex commandExecution;
 	std::jthread thread;
