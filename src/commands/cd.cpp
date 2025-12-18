@@ -9,7 +9,7 @@ namespace Commands {
     int cd(Command command){
         try {
             if (command.arguments.size() < 2) {
-                std::println("{}Error: Missing Arguments [Required: 1, Got: {}]", Color::Red, command.arguments.size());
+                std::println("{}Error: Missing Arguments [Required: 1, Got: {}]", Color::Red, command.arguments.size() - 1);
                 return 1;
             };
             D_PRINTLN("Changing to {}", command.arguments[1]);
