@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <core/history.hpp>
 
 enum class EscapeKey {
     None,
@@ -29,4 +30,5 @@ public:
     static char readchar();
     static std::string readamount(int n);
     static Char readkey();
+    static std::string readLine(History &history, void (*printPrompt)());
 }; // code
