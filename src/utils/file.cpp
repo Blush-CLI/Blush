@@ -20,4 +20,18 @@ namespace File {
         auto currentPath = std::filesystem::current_path(); // eg C:\Users\Raynixx\Documents\Codes\blush_revived\build
         return currentPath.filename().string(); // currentPath.filename() = build; .string turns it to a string
     }
+
+    std::string getenv(const char* name) {
+        if (const char* v = std::getenv(name))
+            return v;
+        return {};
+    }
+
+    std::string getHome() {
+        #ifdef _WIN32
+            return getenv("USERPROFILE");
+        #else
+            return getenv("HOME");
+        #endif
+    }
 }
