@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <string>
 #include <core/history.hpp>
 
@@ -30,5 +31,5 @@ public:
     static char readchar();
     static std::string readamount(int n);
     static Char readkey();
-    static std::string readLine(History &history, void (*printPrompt)());
+    static std::string readLine(History &history, const std::function<void()>& printPrompt);
 }; // code

@@ -1,7 +1,9 @@
-#include <utils/input.hpp>
 #include <cstdio>
 #include <termios.h>
 #include <unistd.h>
+#include <utils/input.hpp>
+#include <functional>
+#include <print>
 
 class TermiosGuard {
 public:
@@ -21,7 +23,6 @@ public:
 private:
   struct termios oldTerm;
 };
-
 
 char Input::readchar() {
   TermiosGuard guard;
@@ -50,7 +51,7 @@ Char Input::readkey() {
   Char result;
   char ch = getchar();
 
-  if (ch == 27) { 
+  if (ch == 27) {
     struct termios newTerm;
     tcgetattr(STDIN_FILENO, &newTerm);
     newTerm.c_lflag &= ~(ICANON | ECHO | ISIG);
@@ -108,100 +109,98 @@ Char Input::readkey() {
   return result;
 }
 
-#include <print>
 
-std::string Input::readLine(History &history, void (*printPrompt)()) {
-    std::string command;
-    int curPos = 0;
-    bool done = false;
+std::string Input::readLine(History &history, const std::function<void()>& printPrompt) {
+  std::string command;
+  int curPos = 0;
+  bool done = false;
 
-    printPrompt();
-    std::print(""); // asegura flush implícito
+  printPrompt();
+  std::print("");
 
-    while (!done) {
-        Char c = Input::readkey();
+  while (!done) {
+    Char c = Input::readkey();
 
-        switch (c.escape) {
-        case EscapeKey::Escape:
-            break;
+    switch (c.escape) {
+    case EscapeKey::Escape:
+      break;
 
-        case EscapeKey::UpArrow: {
-            std::string histCmd = history.getPrevious();
-            if (!histCmd.empty()) {
-                command = histCmd;
-                curPos = command.size();
-                std::print("\r\x1b[2K");
-                printPrompt();
-                std::print("{}", command);
-            }
-        } break;
+    case EscapeKey::UpArrow: {
+      std::string histCmd = history.getPrevious();
+      if (!histCmd.empty()) {
+        command = histCmd;
+        curPos = command.size();
+        std::print("\r\x1b[2K");
+        printPrompt();
+        std::print("{}", command);
+      }
+    } break;
 
-        case EscapeKey::DownArrow: {
-            std::string histCmd = history.getNext();
-            command = histCmd;
-            curPos = command.size();
-            std::print("\r\x1b[2K");
-            printPrompt();
-            std::print("{}", command);
-        } break;
+    case EscapeKey::DownArrow: {
+      std::string histCmd = history.getNext();
+      command = histCmd;
+      curPos = command.size();
+      std::print("\r\x1b[2K");
+      printPrompt();
+      std::print("{}", command);
+    } break;
 
-        case EscapeKey::LeftArrow:
-            if (curPos > 0) {
-                std::print("\x1b[D");
-                curPos--;
-            }
-            break;
+    case EscapeKey::LeftArrow:
+      if (curPos > 0) {
+        std::print("\x1b[D");
+        curPos--;
+      }
+      break;
 
-        case EscapeKey::RightArrow:
-            if (curPos < (int)command.size()) {
-                std::print("\x1b[C");
-                curPos++;
-            }
-            break;
+    case EscapeKey::RightArrow:
+      if (curPos < (int)command.size()) {
+        std::print("\x1b[C");
+        curPos++;
+      }
+      break;
 
-        case EscapeKey::Backspace:
-            if (curPos > 0) {
-                command.erase(curPos - 1, 1);
-                curPos--;
+    case EscapeKey::Backspace:
+      if (curPos > 0) {
+        command.erase(curPos - 1, 1);
+        curPos--;
 
-                std::print("\r\x1b[2K");
-                printPrompt();
-                std::print("{}", command);
+        std::print("\r\x1b[2K");
+        printPrompt();
+        std::print("{}", command);
 
-                std::print("\r");
-                printPrompt();
-                std::print("{}", command.substr(0, curPos));
-            }
-            break;
+        std::print("\r");
+        printPrompt();
+        std::print("{}", command.substr(0, curPos));
+      }
+      break;
 
-        default:
-            if (c.character == '\n' || c.character == '\r') {
-                std::println("");
-                done = true;
-                break;
-            }
+    default:
+      if (c.character == '\n' || c.character == '\r') {
+        std::println("");
+        done = true;
+        break;
+      }
 
-            if (c.character) {
-                command.insert(curPos, 1, c.character);
-                curPos++;
+      if (c.character) {
+        command.insert(curPos, 1, c.character);
+        curPos++;
 
-                std::print("\r\x1b[2K");
-                printPrompt();
-                std::print("{}", command);
+        std::print("\r\x1b[2K");
+        printPrompt();
+        std::print("{}", command);
 
-                std::print("\r");
-                printPrompt();
-                std::print("{}", command.substr(0, curPos));
-            }
-            break;
-        }
+        std::print("\r");
+        printPrompt();
+        std::print("{}", command.substr(0, curPos));
+      }
+      break;
     }
+  }
 
-    if (!command.empty()) {
-        history.add(command);
-        history.reset();
-    }
+  if (!command.empty()) {
+    history.add(command);
+    history.reset();
+  }
 
-    return command;
+  return command;
 }
-
