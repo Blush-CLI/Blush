@@ -1,3 +1,5 @@
 build
 en_chat_ideas.md
 plan.md
+.cache
+.vscode
