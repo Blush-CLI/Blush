@@ -29,4 +29,5 @@ public:
     static char readchar();
     static std::string readamount(int n);
     static Char readkey();
+    static std::string input();
 }; // code

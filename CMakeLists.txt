@@ -11,6 +11,8 @@ add_library(Utils STATIC
     src/utils/file.cpp
     src/utils/string.cpp
     src/utils/audio.cpp
+    src/utils/input.cpp
+    src/utils/saveload.cpp
 )
 
 if(WIN32)
@@ -57,6 +59,7 @@ add_library(Commands STATIC
     src/commands/cd.cpp
     src/commands/help.cpp
     src/commands/history.cpp
+    src/commands/save.cpp
 )
 
 target_include_directories(Commands PRIVATE

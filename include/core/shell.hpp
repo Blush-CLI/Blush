@@ -25,12 +25,11 @@ public:
 		 */
 		~Shell();
 
-		static History* getHistory();
 		Audio* audio;
 private:
 	std::string fullWorkingPath;
 	std::mutex commandExecution;
 	std::jthread thread;
-	History history;
-	static History* currentHistory;
 };
+
+void printPrompt();

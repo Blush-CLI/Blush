@@ -8,13 +8,13 @@
 
 namespace Commands {
     int cd(Command command){
-        D_PRINTLN("Changing to {}", command.arguments[1]);
+        std::string gotoPath;
+        if (command.arguments.size() < 2) gotoPath = File::getHome();
+        else gotoPath = command.arguments[1];
+        
+        D_PRINTLN("Changing to {}", gotoPath);
         try {
-            if (command.arguments.size() < 2) {
-                std::filesystem::current_path(File::getHome());
-                return 0;
-            }
-            std::filesystem::current_path(command.arguments[1]);
+            std::filesystem::current_path(gotoPath);
         } catch(std::filesystem::filesystem_error& e){
             std::println("Error: {}", e.what());
             return 1;

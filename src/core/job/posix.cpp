@@ -10,25 +10,28 @@ Job::Job(Command command) : command(command), exitCode(-1), data(nullptr) {}
 bool Job::run() {
     pid_t pid = fork();
     if (pid < 0) {
+        exitCode = -1;
         return false;
     } else if (pid == 0) {
         std::vector<char*> argv;
-        for (auto& arg : command.arguments) {
-            argv.push_back(arg.data());
+        argv.push_back(const_cast<char*>(command.mainCommand.c_str()));
+        for (size_t i = 1; i < command.arguments.size(); i++) {
+            argv.push_back(const_cast<char*>(command.arguments[i].c_str()));
         }
-        argv.push_back(nullptr); // ull pointer for end of array
+        argv.push_back(nullptr);
 
         execvp(argv[0], argv.data());
-        exit(127);
+        _exit(127);
     } else {
         int status;
-        if (waitpid(pid, &status, 0) == -1) { // process didn't exit successfully
+        if (waitpid(pid, &status, 0) == -1) {
+            exitCode = -1;
             return false;
         }
 
-        if (WIFEXITED(status)) { // back
+        if (WIFEXITED(status)) {
             exitCode = WEXITSTATUS(status);
-            return exitCode == 0; // did it exit successfully?
+            return exitCode == 0;
         } else {
             exitCode = -1;
             return false;

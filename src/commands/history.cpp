@@ -5,13 +5,13 @@
 
 namespace Commands {
     int history(Command command){        
-        History* hist = Shell::getHistory();
-        if(!hist || hist->isEmpty()) {
+        History& hist = History::getInstance();
+        if(hist.isEmpty()) {
             std::println("No command history available.");
             return 0;
         }
 
-        const auto& commands = hist->getCommands();
+        const auto& commands = hist.getCommands();
         for(size_t i = 0; i < commands.size(); i++) {
             std::println("  {}: {}", i + 1, commands[i]);
         }

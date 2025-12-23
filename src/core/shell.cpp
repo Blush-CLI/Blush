@@ -4,6 +4,7 @@
 #include <core/history.hpp>
 #include <utils/file.hpp>
 #include <utils/input.hpp>
+#include <utils/saveload.hpp>
 #include <tui/colors.hpp>
 #include <cstdlib>
 #include <iostream>
@@ -11,11 +12,26 @@
 #include <print>
 #include <blush.hpp>
 extern Audio audio;
-History* Shell::currentHistory = nullptr;
 
 void Shell::Init() {
     this->audio = &::audio;
-    currentHistory = &history;
+
+    std::vector<std::string> savedHistory;
+    uint8_t flags = 0;
+    if (SaveLoad::load(savedHistory, flags)) {
+        if (flags & static_cast<uint8_t>(SaveFlags::SaveHistory)) {
+            History& hist = History::getInstance();
+            for (const auto& command : savedHistory) {
+                hist.add(command);
+            }
+            std::println("{}[  OK  ]{} Loaded {} commands from history{}",
+                Color::Green, 
+                Color::Purple,
+                savedHistory.size(),
+                Color::Reset);
+        }
+    }
+    
     std::println("{}[  OK  ]{} Shell initialized!{}",
         Color::Green, 
         Color::Purple,
@@ -24,143 +40,35 @@ void Shell::Init() {
     D_PRINTLN("Shell process exited with code {}", rcode);
 }
 
-History* Shell::getHistory() {
-    return currentHistory;
-}
-
 void printPrompt() {
-    std::cout
-            << Color::Purple
-            << "["
-            << File::lcwd()
-            << "]"
-            << " "
-            << Color::Blue
-            << "> "
-            << Color::Reset
-            << std::flush;
+    std::print("{}[{}] {}> {}",
+        Color::Purple,
+        File::lcwd(),
+        Color::Blue,
+        Color::Reset
+    );
 }
 
 int Shell::run() {
-    audio->play("./music/jump.wav");
     while(true){
-        printPrompt();
-        std::string command; // it sounds like a kick
-        bool escaped = false;
-        bool replace = true;
-        int curPos = 0;
-
-        while(true){
-            Char c = Input::readkey();
-            bool done = false;
-            switch(c.escape) {
-                case EscapeKey::Escape: {
-                    escaped = true;
-                    std::cout << "\x1b[2K\r[ESCAPE] i: input | r: replace" << std::flush;
-                } break; // can u try running this on real console and test escape
-                case EscapeKey::UpArrow: {
-                    std::string histCmd = history.getPrevious();
-                    if(!histCmd.empty()) {
-                        std::cout << "\x1b[2K\r" << std::flush;
-                        printPrompt();
-                        command = histCmd;
-                        curPos = command.size();
-                        std::cout << command << std::flush;
-                    }
-                } break;
-                case EscapeKey::DownArrow: {
-                    std::string histCmd = history.getNext();
-                    std::cout << "\x1b[2K\r" << std::flush;
-                    printPrompt();
-                    command = histCmd;
-                    curPos = command.size();
-                    std::cout << command << std::flush;
-                } break;
-                case EscapeKey::LeftArrow: {
-                    if(curPos > 0) {
-                        std::cout << "\b";
-                        curPos--;
-                    }
-                } break;
-                case EscapeKey::RightArrow: {
-                    if(curPos < command.size()) {
-                        std::cout << "\x1b[C";
-                        curPos++;
-                    }
-                } break;
-                case EscapeKey::Backspace: {
-                    if(curPos > 0) {
-                        command.pop_back();
-                        curPos--;
-                        std::print("\b \b");
-                    }
-                } break;
-
-                default: {
-
-                    if(escaped) {
-                        switch(c.character) {
-                            case 'i':
-                            case 'I':
-                                replace = false;
-                                escaped = false;
-                                std::cout << "\x1b[2K\r" << std::flush;
-                                printPrompt();
-                                std::cout << command;
-                            break;
-                                
-                            case 'r':
-                            case 'R':
-                                replace = true;
-                                escaped = false;
-                                std::cout << "\x1b[2K\r" << std::flush;
-                                printPrompt();
-                                std::cout << command;
-                            break;
-                        }
-                        break;
-                    }
-
-                    switch(c.character + 'A' - 1){
-                        case 'Q': // Ctrl + Q  
-                            std::println();
-                            exit(0);
-                    }
+        std::string command = Input::input();
         
-                    if(c.character == '\n' || (c.character == '\r')) {
-                        std::println();
-                        done = true;
-                        break;
-                    }
-        
-                    command += c.character;
-                    std::cout << c.character << std::flush; // yes backspace is still something
-                }
-            }
-            if(done) break;
-        }
-
         try {
             if(command.empty()) continue;
-            
-            history.add(command);
-            history.reset();
-            
             Command cmd(command);
-
-            if(cmd.mainCommand == "exit") exit(0);
             
             if(commands_map.find(cmd.mainCommand) != commands_map.end()) {
-                commands_map[cmd.mainCommand].func(cmd);
+                int exitCode = commands_map[cmd.mainCommand].func(cmd);
+                setenv("?", std::to_string(exitCode).c_str(), 1);
             } else {
-                Job job(command);
+                Job job(cmd);
                 bool result = job.run();
-                if(!result) {
-                    audio->play("C:\\Users\\Raynixx\\Documents\\Codes\\blush_revived\\music\\jump.wav");
+                if(job.exitCode == 127) {
                     std::println("{}Error: '{}{}{}{}' | Command not found. \
                         \n{}> Exit code: {}",
                         Color::Red, Color::Bold, cmd.mainCommand, Color::Reset, Color::Red, Color::Yellow, job.exitCode);
-                } // alt up arrow
+                }
+                setenv("?", std::to_string(job.exitCode).c_str(), 1);
             }
         } catch (std::exception& e) {
             std::println("An error occured: {}", e.what());
@@ -170,5 +78,20 @@ int Shell::run() {
 }
 
 Shell::~Shell() {
+    History& hist = History::getInstance();
+    uint8_t flags = static_cast<uint8_t>((uint8_t)SaveFlags::Healthy | (uint8_t)SaveFlags::SaveHistory);
+    
+    if (SaveLoad::save(hist.getCommands(), flags)) {
+        std::println("{}[  OK  ]{} History saved{}",
+            Color::Green, 
+            Color::Purple,
+            Color::Reset);
+    } else {
+        std::println("{}[WARN]{} Failed to save history{}",
+            Color::Yellow, 
+            Color::Purple,
+            Color::Reset);
+    }
+    
     std::println("Goodbye!");
 }

@@ -3,7 +3,13 @@
 #include <vector>
 
 class History {
+private:
+    History() = default;
 public:
+    static History& getInstance() {
+        static History instance;
+        return instance;
+    }
     void add(const std::string& command);
     std::string getPrevious();
     std::string getNext();

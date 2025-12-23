@@ -6,7 +6,6 @@
 
 Job::Job(Command command) : command(command), exitCode(-1), data(nullptr) {}
 
-
 bool Job::run(){
     STARTUPINFOA info{};
     info.cb = sizeof(info);
@@ -25,7 +24,7 @@ bool Job::run(){
         nullptr,
         &info,
         &pInfo
-    )) return false; // failed
+    )) return false;
 
     WaitForSingleObject(pInfo.hProcess, INFINITE);
 
