@@ -43,5 +43,5 @@ sinfo - Seems useless, but it's just cool to see the specs of your PC in Blush!
 
 <img width="722" height="157" alt="image" src="https://github.com/user-attachments/assets/95a2161a-1b91-4adf-b96a-e1afaeea947f" />
 
-# Website
+# Website!
 > https://getblush.xyz/
