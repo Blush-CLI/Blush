@@ -1,4 +1,4 @@
-# Blush - CLI [IN DEVELOPMENT]
+# Blush - CLI [MASTER]
 
 ![](https://img.shields.io/github/last-commit/Blush-CLI/Blush?style=for-the-badge&color=8AD7EB&logo=git&logoColor=FFFFFF&labelColor=1E202B)
 
